@@ -25,6 +25,7 @@ struct FeedView: View {
                                 .frame(height: 250)
                                 .padding(.horizontal)
                                 .redacted(reason: .placeholder)
+                                .shimmer()
                         }
                     }
                     .padding(.horizontal)
@@ -36,6 +37,7 @@ struct FeedView: View {
                             .frame(height: 120)
                             .padding(.horizontal)
                             .redacted(reason: .placeholder)
+                            .shimmer()
                     }
                 } else if viewModel.characters.isEmpty {
                     ContentUnavailableView(
@@ -68,11 +70,17 @@ struct FeedView: View {
                     }
                 }
             }
+            .onAppear {
+//                viewModel.loadDataWithCompletionHandler()
+////                viewModel.loadDataWithCombine()
+            }
             .task {
-                await viewModel.loadData()
+                await viewModel.loadDataAsync()
             }
             .refreshable {
-                await viewModel.loadData()
+//                viewModel.loadDataWithCompletionHandler()
+//                viewModel.loadDataWithCombine()
+                await viewModel.loadDataAsync()
             }
             .navigationTitle("Feeds")
         }
