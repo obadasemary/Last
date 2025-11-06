@@ -24,9 +24,9 @@ struct LastTests {
         }
         
         let viewModel = FeedViewModel(feedUseCase: makeSut())
-        
-        await viewModel.loadData()
-        
+
+        await viewModel.loadDataAsync()
+
         #expect(viewModel.characters == response.results)
     }
 
@@ -38,9 +38,9 @@ struct LastTests {
         }
         
         let viewModel = FeedViewModel(feedUseCase: makeSut())
-        
-        await viewModel.loadData()
-        
+
+        await viewModel.loadDataAsync()
+
         #expect(viewModel.characters.isEmpty)
     }
 }
