@@ -8,9 +8,9 @@
 import Foundation
 
 struct FeedEntity: Decodable, Sendable {
-    
+
     let info: InfoResponse
-    let results: [CharactarsResponse]
+    let results: [CharactersResponse]
 }
 
 extension FeedEntity {
@@ -21,25 +21,25 @@ extension FeedEntity {
             pages: 1
         ),
         results: [
-            CharactarsResponse(
+            CharactersResponse(
                 id: 1,
                 name: "Obada",
                 species: "Engineer",
                 image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
             ),
-            CharactarsResponse(
+            CharactersResponse(
                 id: 2,
                 name: "Sara",
                 species: "Engineer",
                 image: URL(string: "https://rickandmortyapi.com/api/character/avatar/2.jpeg")
             ),
-            CharactarsResponse(
+            CharactersResponse(
                 id: 3,
                 name: "Omar",
                 species: "Engineer",
                 image: URL(string: "https://rickandmortyapi.com/api/character/avatar/3.jpeg")
             ),
-            CharactarsResponse(
+            CharactersResponse(
                 id: 4,
                 name: "Nazli",
                 species: "Engineer",
@@ -54,7 +54,7 @@ struct InfoResponse: Decodable, Sendable {
     let pages: Int
 }
 
-struct CharactarsResponse: Decodable, Identifiable, Equatable, Sendable {
+struct CharactersResponse: Decodable, Identifiable, Equatable, Sendable {
     let id: Int
     let name: String
     let species: String?
