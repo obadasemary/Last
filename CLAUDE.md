@@ -62,6 +62,38 @@ The project uses Swift Testing framework (not XCTest). Test files use:
 - `#expect` for assertions
 - `@MainActor` when testing view models
 
+## Development Workflow
+
+### Pre-Commit Checks
+
+**IMPORTANT**: Always build and run tests before committing code. A git pre-commit hook is configured to automatically:
+1. Build the project
+2. Run all tests
+3. Block the commit if either fails
+
+This ensures no broken code enters the repository.
+
+### Manual Build and Test
+
+If you need to run checks manually:
+
+```bash
+# Build the project
+xcodebuild -scheme Last -project Last.xcodeproj build
+
+# Run all tests
+xcodebuild -scheme Last -project Last.xcodeproj test
+
+# Both commands must succeed before committing
+```
+
+### Bypassing Pre-Commit Hook (Not Recommended)
+
+Only in exceptional circumstances:
+```bash
+git commit --no-verify -m "your message"
+```
+
 ## Code Organization
 
 ### File Naming Conventions
