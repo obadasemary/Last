@@ -11,4 +11,8 @@ class MockFeedRepository: FeedRepositoryProtocol {
     func fetchFeed(url: URL) async throws -> FeedEntity {
         FeedEntity.mock
     }
+
+    func fetchFeed(url: URL, onComplete: @escaping (Result<FeedEntity, Error>) -> Void) {
+        onComplete(.success(FeedEntity.mock))
+    }
 }
