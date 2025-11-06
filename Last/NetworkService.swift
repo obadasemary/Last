@@ -28,7 +28,7 @@ extension NetworkService: NetworkServiceProtocol {
         
         guard let httpResponse = response as? HTTPURLResponse
                 , (200...299).contains(httpResponse.statusCode) else {
-            throw NetworkError.invalideResponse
+            throw NetworkError.invalidResponse
         }
         
         do {
