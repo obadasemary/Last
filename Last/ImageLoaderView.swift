@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct ImageLoaderView: View {
-    
+
     let url: URL?
-    let imageSize: CGFloat
-    
-    init(url: URL?, imageSize: CGFloat = 100) {
+
+    init(url: URL?) {
         self.url = url
-        self.imageSize = imageSize
     }
     
     var body: some View {
