@@ -67,8 +67,8 @@ The project uses Swift Testing framework (not XCTest). Test files use:
 ### Pre-Commit Checks
 
 **IMPORTANT**: Always build and run tests before committing code. A git pre-commit hook is configured to automatically:
-1. Build the project
-2. Run all tests
+1. Build the project for iOS Simulator
+2. Run unit tests (UI tests are skipped for speed)
 3. Block the commit if either fails
 
 This ensures no broken code enters the repository.
