@@ -475,6 +475,7 @@ struct NetworkServiceTests {
 // MARK: - Mock URLProtocol
 
 final class MockURLProtocol: URLProtocol {
+    
     private static var _lock = NSLock()
     private static var _mockData: Data?
     private static var _mockResponse: URLResponse?
