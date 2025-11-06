@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CharacterCardView: View {
     
-    let character: CharactarsResponse
+    let character: CharactersResponse
     
     var body: some View {
         ZStack(alignment: .bottom) {
