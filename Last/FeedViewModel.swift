@@ -22,14 +22,16 @@ final class FeedViewModel {
     
     func loadData() async {
         isLoading = true
-        
+
         do {
+            #if DEBUG
             try? await Task.sleep(for: .seconds(3))
+            #endif
             try await fetchFeed()
         } catch {
             errorMessage = error.localizedDescription
         }
-        
+
         isLoading = false
     }
 }
