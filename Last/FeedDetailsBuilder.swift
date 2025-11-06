@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 final class FeedDetailsBuilder {
 
-    func buildFeedDetailsView(character: CharactarsResponse) -> some View {
+    func buildFeedDetailsView(character: CharactersResponse) -> some View {
         let viewModel = FeedDetailsViewModel(character: character)
         return FeedDetailsView(viewModel: viewModel)
     }
