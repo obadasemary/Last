@@ -150,6 +150,111 @@ struct FeedRepositoryTests {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
+
+    // MARK: - Combine Tests
+
+    @MainActor
+    @Test("FeedRepository Combine fetchFeed - Success")
+    func combineFetchFeed_WithSuccess_PublishesEntity() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .success(FeedEntity.mock)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
+        let result: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = publisher.sink(
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        continuation.resume(throwing: error)
+                    }
+                    cancellable?.cancel()
+                },
+                receiveValue: { value in
+                    continuation.resume(returning: value)
+                }
+            )
+        }
+
+        // Then
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(result.info.pages == FeedEntity.mock.info.pages)
+        #expect(result.results.count == FeedEntity.mock.results.count)
+        #expect(mockNetworkService.executeCombineCallCount == 1)
+    }
+
+    @MainActor
+    @Test("FeedRepository Combine fetchFeed - Network Error")
+    func combineFetchFeed_WithNetworkError_PublishesError() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .failure(NetworkError.invalidResponse)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
+        do {
+            let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+                var cancellable: AnyCancellable?
+                cancellable = publisher.sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            continuation.resume(throwing: error)
+                        }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { value in
+                        continuation.resume(returning: value)
+                    }
+                )
+            }
+            Issue.record("Expected to throw error")
+        } catch let error as NetworkError {
+            #expect(error == .invalidResponse)
+            #expect(mockNetworkService.executeCombineCallCount == 1)
+        } catch {
+            Issue.record("Expected NetworkError but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("FeedRepository Combine fetchFeed - Decoding Error")
+    func combineFetchFeed_WithDecodingError_PublishesError() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .failure(NetworkError.decodingError)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
+        do {
+            let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+                var cancellable: AnyCancellable?
+                cancellable = publisher.sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            continuation.resume(throwing: error)
+                        }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { value in
+                        continuation.resume(returning: value)
+                    }
+                )
+            }
+            Issue.record("Expected to throw error")
+        } catch let error as NetworkError {
+            #expect(error == .decodingError)
+            #expect(mockNetworkService.executeCombineCallCount == 1)
+        } catch {
+            Issue.record("Expected NetworkError but got \(error)")
+        }
+    }
 }
 
 // MARK: - MockNetworkService

@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import Combine
 
 protocol FeedRepositoryProtocol {
     func fetchFeed(url: URL, onComplete: @escaping (Result<FeedEntity, Error>) -> Void)
+    func fetchFeed(url: URL) -> AnyPublisher<FeedEntity, Error>
     func fetchFeed(url: URL) async throws -> FeedEntity
 }
 
@@ -22,9 +24,6 @@ final class FeedRepository {
 }
 
 extension FeedRepository: FeedRepositoryProtocol {
-    func fetchFeed(url: URL) async throws -> FeedEntity {
-        try await networkService.execute(URLRequest(url: url))
-    }
     
     func fetchFeed(
         url: URL,
@@ -33,5 +32,13 @@ extension FeedRepository: FeedRepositoryProtocol {
         networkService.execute(URLRequest(url: url)) { (result: Result<FeedEntity, Error>) in
             onComplete(result)
         }
+    }
+    
+    func fetchFeed(url: URL) -> AnyPublisher<FeedEntity, Error> {
+        return networkService.execute(URLRequest(url: url))
+    }
+    
+    func fetchFeed(url: URL) async throws -> FeedEntity {
+        try await networkService.execute(URLRequest(url: url))
     }
 }
