@@ -36,7 +36,8 @@ struct CharacterCardView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(character.name)
-                    .font(.title)
+                    .font(.title3)
+                    .lineLimit(1)
                     .foregroundStyle(.primary)
                 
                 if let species = character.species {
