@@ -30,6 +30,8 @@ struct CharacterView: View {
                     Image(systemName: "person.fill")
                         .resizable()
                         .scaledToFit()
+                        .frame(width: 100, height: 100)
+                        .cornerRadius(4)
                 @unknown default:
                     EmptyView()
                 }
@@ -37,7 +39,8 @@ struct CharacterView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(character.name)
-                    .font(.title)
+                    .font(.title3)
+                    .lineLimit(1)
                     .foregroundStyle(.primary)
                 
                 if let species = character.species {
