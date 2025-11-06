@@ -41,6 +41,6 @@ extension NetworkService: NetworkServiceProtocol {
 }
 
 enum NetworkError: Error {
-    case invalideResponse
+    case invalidResponse
     case decodingError
 }
