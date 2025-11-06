@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Combine
 
 protocol NetworkServiceProtocol {
-    func execute<T: Decodable>(_ request: URLRequest) async throws -> T
     func execute<T: Decodable>(_ request: URLRequest, onCompleted: @escaping (Result<T, Error>) -> Void)
+    func execute<T: Decodable>(_ request: URLRequest) -> AnyPublisher<T, Error>
+    func execute<T: Decodable>(_ request: URLRequest) async throws -> T
 }
 
 final class NetworkService {
@@ -22,23 +24,6 @@ final class NetworkService {
 }
 
 extension NetworkService: NetworkServiceProtocol {
-    
-    func execute<T: Decodable>(_ request: URLRequest) async throws -> T {
-        
-        let (data, response) = try await session.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse
-                , (200...299).contains(httpResponse.statusCode) else {
-            throw NetworkError.invalidResponse
-        }
-        
-        do {
-            let decodedResponse = try JSONDecoder().decode(T.self, from: data)
-            return decodedResponse
-        } catch {
-            throw NetworkError.decodingError
-        }
-    }
     
     func execute<T: Decodable>(
         _ request: URLRequest,
@@ -68,6 +53,44 @@ extension NetworkService: NetworkServiceProtocol {
         }
 
         task.resume()
+    }
+
+    func execute<T: Decodable>(
+        _ request: URLRequest
+    ) -> AnyPublisher<T, Error> {
+        return session.dataTaskPublisher(for: request)
+            .tryMap { data, response in
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    throw NetworkError.invalidResponse
+                }
+                return data
+            }
+            .decode(type: T.self, decoder: JSONDecoder())
+            .mapError { error in
+                if error is DecodingError {
+                    return NetworkError.decodingError
+                }
+                return error
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func execute<T: Decodable>(_ request: URLRequest) async throws -> T {
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse
+                , (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.invalidResponse
+        }
+        
+        do {
+            let decodedResponse = try JSONDecoder().decode(T.self, from: data)
+            return decodedResponse
+        } catch {
+            throw NetworkError.decodingError
+        }
     }
 }
 
