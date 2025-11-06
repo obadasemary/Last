@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import Combine
 @testable import Last
 
 @Suite(.serialized)
@@ -14,6 +15,7 @@ struct NetworkServiceTests {
 
     // MARK: - Async/Await Tests
 
+    @MainActor
     @Test("NetworkService async execute - Success with valid JSON")
     func asyncExecute_WithValidJSON_ReturnsDecodedData() async throws {
         // Given
@@ -52,6 +54,7 @@ struct NetworkServiceTests {
         #expect(result.results.isEmpty)
     }
 
+    @MainActor
     @Test("NetworkService async execute - Invalid response (404)")
     func asyncExecute_WithInvalidStatusCode_ThrowsInvalidResponseError() async throws {
         // Given
@@ -82,6 +85,7 @@ struct NetworkServiceTests {
         }
     }
 
+    @MainActor
     @Test("NetworkService async execute - Invalid JSON")
     func asyncExecute_WithInvalidJSON_ThrowsDecodingError() async throws {
         // Given
@@ -114,6 +118,7 @@ struct NetworkServiceTests {
         }
     }
 
+    @MainActor
     @Test("NetworkService async execute - Network error")
     func asyncExecute_WithNetworkError_ThrowsError() async throws {
         // Given
@@ -138,7 +143,7 @@ struct NetworkServiceTests {
     }
 
     // MARK: - Completion Handler Tests
-
+    @MainActor
     @Test("NetworkService completion handler - Success with valid JSON")
     func completionExecute_WithValidJSON_ReturnsSuccess() async throws {
         // Given
@@ -181,6 +186,7 @@ struct NetworkServiceTests {
         #expect(result.results.isEmpty)
     }
 
+    @MainActor
     @Test("NetworkService completion handler - Invalid response")
     func completionExecute_WithInvalidStatusCode_ReturnsFailure() async throws {
         // Given
@@ -215,6 +221,7 @@ struct NetworkServiceTests {
         }
     }
 
+    @MainActor
     @Test("NetworkService completion handler - Decoding error")
     func completionExecute_WithInvalidJSON_ReturnsFailure() async throws {
         // Given
@@ -251,6 +258,7 @@ struct NetworkServiceTests {
         }
     }
 
+    @MainActor
     @Test("NetworkService completion handler - Network error")
     func completionExecute_WithNetworkError_ReturnsFailure() async throws {
         // Given
@@ -271,6 +279,191 @@ struct NetworkServiceTests {
                 networkService.execute(request) { (result: Result<FeedEntity, Error>) in
                     continuation.resume(with: result)
                 }
+            }
+            Issue.record("Expected to throw network error")
+        } catch {
+            #expect(error is NSError)
+        }
+    }
+
+    // MARK: - Combine Tests
+
+    @MainActor
+    @Test("NetworkService Combine - Success with valid JSON")
+    func combineExecute_WithValidJSON_ReturnsDecodedData() async throws {
+        // Given
+        MockURLProtocol.reset()
+        let mockData = """
+        {
+            "info": {
+                "count": 3,
+                "pages": 1
+            },
+            "results": []
+        }
+        """.data(using: .utf8)!
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        MockURLProtocol.mockData = mockData
+        MockURLProtocol.mockResponse = HTTPURLResponse(
+            url: URL(string: "https://test.com")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        MockURLProtocol.mockError = nil
+
+        let session = URLSession(configuration: configuration)
+        let networkService = NetworkService(session: session)
+        let request = URLRequest(url: URL(string: "https://test.com")!)
+
+        // When
+        let publisher: AnyPublisher<FeedEntity, Error> = networkService.execute(request)
+        let result: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = publisher.sink(
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        continuation.resume(throwing: error)
+                    }
+                    cancellable?.cancel()
+                },
+                receiveValue: { value in
+                    continuation.resume(returning: value)
+                }
+            )
+        }
+
+        // Then
+        #expect(result.info.count == 3)
+        #expect(result.info.pages == 1)
+        #expect(result.results.isEmpty)
+    }
+
+    @MainActor
+    @Test("NetworkService Combine - Invalid response")
+    func combineExecute_WithInvalidStatusCode_PublishesError() async throws {
+        // Given
+        MockURLProtocol.reset()
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        MockURLProtocol.mockData = Data()
+        MockURLProtocol.mockResponse = HTTPURLResponse(
+            url: URL(string: "https://test.com")!,
+            statusCode: 404,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        MockURLProtocol.mockError = nil
+
+        let session = URLSession(configuration: configuration)
+        let networkService = NetworkService(session: session)
+        let request = URLRequest(url: URL(string: "https://test.com")!)
+
+        // When/Then
+        let publisher: AnyPublisher<FeedEntity, Error> = networkService.execute(request)
+        do {
+            let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+                var cancellable: AnyCancellable?
+                cancellable = publisher.sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            continuation.resume(throwing: error)
+                        }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { value in
+                        continuation.resume(returning: value)
+                    }
+                )
+            }
+            Issue.record("Expected to throw NetworkError.invalidResponse")
+        } catch let error as NetworkError {
+            #expect(error == .invalidResponse)
+        } catch {
+            Issue.record("Expected NetworkError.invalidResponse but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("NetworkService Combine - Decoding error")
+    func combineExecute_WithInvalidJSON_PublishesError() async throws {
+        // Given
+        MockURLProtocol.reset()
+        let mockData = "invalid json data".data(using: .utf8)!
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        MockURLProtocol.mockData = mockData
+        MockURLProtocol.mockResponse = HTTPURLResponse(
+            url: URL(string: "https://test.com")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        MockURLProtocol.mockError = nil
+
+        let session = URLSession(configuration: configuration)
+        let networkService = NetworkService(session: session)
+        let request = URLRequest(url: URL(string: "https://test.com")!)
+
+        // When/Then
+        let publisher: AnyPublisher<FeedEntity, Error> = networkService.execute(request)
+        do {
+            let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+                var cancellable: AnyCancellable?
+                cancellable = publisher.sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            continuation.resume(throwing: error)
+                        }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { value in
+                        continuation.resume(returning: value)
+                    }
+                )
+            }
+            Issue.record("Expected to throw NetworkError.decodingError")
+        } catch let error as NetworkError {
+            #expect(error == .decodingError)
+        } catch {
+            Issue.record("Expected NetworkError.decodingError but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("NetworkService Combine - Network error")
+    func combineExecute_WithNetworkError_PublishesError() async throws {
+        // Given
+        MockURLProtocol.reset()
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        MockURLProtocol.mockData = nil
+        MockURLProtocol.mockResponse = nil
+        MockURLProtocol.mockError = NSError(domain: "TestError", code: -1009, userInfo: nil)
+
+        let session = URLSession(configuration: configuration)
+        let networkService = NetworkService(session: session)
+        let request = URLRequest(url: URL(string: "https://test.com")!)
+
+        // When/Then
+        let publisher: AnyPublisher<FeedEntity, Error> = networkService.execute(request)
+        do {
+            let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+                var cancellable: AnyCancellable?
+                cancellable = publisher.sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            continuation.resume(throwing: error)
+                        }
+                        cancellable?.cancel()
+                    },
+                    receiveValue: { value in
+                        continuation.resume(returning: value)
+                    }
+                )
             }
             Issue.record("Expected to throw network error")
         } catch {
