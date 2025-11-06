@@ -60,7 +60,7 @@ struct FeedDetailsView: View {
     NavigationStack {
         FeedDetailsView(
             viewModel: FeedDetailsViewModel(
-                character: CharactarsResponse(
+                character: CharactersResponse(
                     id: 1,
                     name: "Rick Sanchez",
                     species: "Human",

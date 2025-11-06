@@ -19,7 +19,7 @@ class MockFeedUseCase: FeedUseCaseProtocol {
     func fetchFeed(url: URL) async throws -> FeedEntity {
         switch result {
         case .success(let response):
-            response
+            return response
         case .failure(let error):
             throw error
         }
