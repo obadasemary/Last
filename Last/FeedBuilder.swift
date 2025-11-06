@@ -27,11 +27,5 @@ final class FeedBuilder {
         let detailsBuilder = FeedDetailsBuilder()
         return FeedView(viewModel: viewModel)
             .environment(detailsBuilder)
-        
-//        let networkService = NetworkService(session: .shared)
-//        let feedRepository = FeedRepository(networkService: networkService)
-//        let feedUseCase = FeedUseCase(feedRepository: feedRepository)
-//        let viewModel = FeedViewModel(feedUseCase: feedUseCase)
-//        return FeedView(viewModel: viewModel)
     }
 }
