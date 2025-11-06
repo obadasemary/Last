@@ -100,7 +100,7 @@ Each layer depends only on protocols from the layer below, enabling:
 - Accepts any `URLRequest`
 - Returns any `Decodable` type
 - Handles HTTP status validation (200-299)
-- Provides specific error types: `NetworkError.invalideResponse`, `NetworkError.decodingError`
+- Provides specific error types: `NetworkError.invalidResponse`, `NetworkError.decodingError`
 
 ### State Management
 
