@@ -9,10 +9,7 @@ import Foundation
 import Combine
 
 class MockFeedRepository: FeedRepositoryProtocol {
-    func fetchFeed(url: URL) async throws -> FeedEntity {
-        FeedEntity.mock
-    }
-
+    
     func fetchFeed(url: URL, onComplete: @escaping (Result<FeedEntity, Error>) -> Void) {
         onComplete(.success(FeedEntity.mock))
     }
@@ -21,5 +18,9 @@ class MockFeedRepository: FeedRepositoryProtocol {
         Just(FeedEntity.mock)
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
+    }
+    
+    func fetchFeed(url: URL) async throws -> FeedEntity {
+        FeedEntity.mock
     }
 }
