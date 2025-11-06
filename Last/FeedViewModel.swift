@@ -12,7 +12,7 @@ final class FeedViewModel {
     
     private let feedUseCase: FeedUseCaseProtocol
     
-    private(set) var characters: [CharactarsResponse] = []
+    private(set) var characters: [CharactersResponse] = []
     private(set) var isLoading: Bool = false
     private(set) var errorMessage: String?
     

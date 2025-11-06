@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CharacterView: View {
     
-    let character: CharactarsResponse
+    let character: CharactersResponse
     
     
     var body: some View {

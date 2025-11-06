@@ -11,9 +11,9 @@ import Foundation
 @Observable
 final class FeedDetailsViewModel {
 
-    let character: CharactarsResponse
+    let character: CharactersResponse
 
-    init(character: CharactarsResponse) {
+    init(character: CharactersResponse) {
         self.character = character
     }
 }
