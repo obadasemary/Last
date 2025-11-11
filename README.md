@@ -110,7 +110,7 @@ Last/
 ├── FeedUIKit/                      # Main feed (UIKit)
 │   ├── FeedUIKitViewController.swift
 │   ├── FeedUIKitBuilder.swift
-│   └── Collection View Cells/
+│   └── Collection View Cells
 ├── FeedDetailsView/
 │   ├── FeedDetailsView.swift
 │   ├── FeedDetailsViewModel.swift
