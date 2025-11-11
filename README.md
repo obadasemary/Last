@@ -7,7 +7,7 @@ A SwiftUI iOS application demonstrating Clean Architecture principles with both 
 - **Dual UI Implementations**: Compare SwiftUI and UIKit side-by-side
 - **Clean Architecture**: Clear separation of concerns across presentation, domain, and data layers
 - **Advanced Image Caching**: Multiple caching strategies with dependency injection
-- **Modern Swift**: Uses Swift 6 features including `@Observable` and structured concurrency
+- **Modern Swift**: Uses modern Swift features like `@Observable` and structured concurrency
 - **Comprehensive Testing**: Unit tests with mock implementations
 
 ## Architecture
