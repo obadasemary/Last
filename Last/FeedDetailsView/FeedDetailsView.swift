@@ -45,6 +45,53 @@ struct FeedDetailsView: View {
                             .foregroundStyle(.secondary)
                     }
                     .font(.title3)
+                    
+                    HStack {
+                        Button {
+                            Task {
+                                await downloadAndSaveImage()
+                            }
+                        } label: {
+                            Text("Save to Cache")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .padding()
+                                .background(Color(.systemBlue))
+                                .cornerRadius(10)
+                        }
+
+                        Button {
+                            viewModel.removeFromCache()
+                        } label: {
+                            Text("Delete from Cache")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .padding()
+                                .background(Color(.systemRed))
+                                .cornerRadius(10)
+                        }
+                        
+                        Button {
+                            viewModel.getFromCache()
+                        } label: {
+                            Text("Get from Cache")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .padding()
+                                .background(Color(.systemGreen))
+                                .cornerRadius(10)
+                        }
+                    }
+//                    .padding(.horizontal)
+                    if let image = viewModel.cachedImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 200, height: 200)
+                            .clipped()
+                            .cornerRadius(10)
+                    }
+                    
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -53,6 +100,19 @@ struct FeedDetailsView: View {
         .ignoresSafeArea(.all, edges: .top)
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func downloadAndSaveImage() async {
+        guard let imageURL = viewModel.character.image else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: imageURL)
+            if let uiImage = UIImage(data: data) {
+                viewModel.saveToCache(image: uiImage)
+            }
+        } catch {
+            print("Failed to download image: \(error)")
+        }
     }
 }
 
