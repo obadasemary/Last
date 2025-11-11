@@ -29,6 +29,7 @@ struct FeedView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.bottom)
                     
                     ForEach(0..<6, id: \.self) { _ in
                         RoundedRectangle(cornerRadius: 12)
@@ -57,6 +58,7 @@ struct FeedView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.bottom)
                     
                     LazyVStack {
                         ForEach(viewModel.characters, id: \.id) { character in
