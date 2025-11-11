@@ -12,7 +12,9 @@ import SwiftUI
 final class FeedDetailsBuilder {
 
     func buildFeedDetailsView(character: CharactersResponse) -> some View {
-        let viewModel = FeedDetailsViewModel(character: character)
+        let viewModel = FeedDetailsViewModel(
+            character: character
+        )
         return FeedDetailsView(viewModel: viewModel)
     }
 }
