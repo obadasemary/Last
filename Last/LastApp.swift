@@ -11,8 +11,7 @@ import SwiftUI
 struct LastApp: App {
     var body: some Scene {
         WindowGroup {
-            let feedBuilder = FeedBuilder()
-            feedBuilder.buildFeedView()
+            TabBarView()
         }
     }
 }
