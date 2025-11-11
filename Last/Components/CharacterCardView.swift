@@ -13,7 +13,7 @@ struct CharacterCardView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            AsyncImage(url: character.image) { phase in
+            CachedAsyncImage(url: character.image) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
