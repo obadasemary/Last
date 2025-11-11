@@ -15,8 +15,8 @@ struct Shimmer: ViewModifier {
             .overlay(
                 LinearGradient(
                     gradient: Gradient(colors: [.clear, .white.opacity(0.4), .clear]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    startPoint: .leading,
+                    endPoint: .trailing
                 )
                 .blendMode(.overlay)
                 .mask(content)
