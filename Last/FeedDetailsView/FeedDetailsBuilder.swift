@@ -11,9 +11,13 @@ import SwiftUI
 @Observable
 final class FeedDetailsBuilder {
 
-    func buildFeedDetailsView(character: CharactersResponse) -> some View {
+    func buildFeedDetailsView(
+        character: CharactersResponse,
+        cacheManager: CacheManagerProtocol = CacheManager.instance
+    ) -> some View {
         let viewModel = FeedDetailsViewModel(
-            character: character
+            character: character,
+            cacheManager: cacheManager
         )
         return FeedDetailsView(viewModel: viewModel)
     }
