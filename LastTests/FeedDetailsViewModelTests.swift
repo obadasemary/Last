@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 @testable import Last
 
-@Suite(.serialized)
+@Suite
 struct FeedDetailsViewModelTests {
 
     // MARK: - Initialization Tests
@@ -25,9 +25,10 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
         )
+        let mockCacheManager = MockCacheManager()
 
         // When
-        let viewModel = FeedDetailsViewModel(character: character)
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // Then
         #expect(viewModel.character.id == character.id)
@@ -48,9 +49,10 @@ struct FeedDetailsViewModelTests {
             species: "Alien",
             image: nil
         )
+        let mockCacheManager = MockCacheManager()
 
         // When
-        let viewModel = FeedDetailsViewModel(character: character)
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // Then
         #expect(viewModel.character.image == nil)
@@ -69,7 +71,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://test.com/image.jpeg")
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let newBrightness: CGFloat = 0.5
 
         // When
@@ -89,7 +92,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://test.com/image.jpeg")
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let minBrightness: CGFloat = 0.0
 
         // When
@@ -109,7 +113,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://test.com/image.jpeg")
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let maxBrightness: CGFloat = 1.0
 
         // When
@@ -129,7 +134,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://test.com/image.jpeg")
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // When
         viewModel.updateBrightness(0.3)
@@ -158,16 +164,15 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
-
-        // Clear cache first
-        viewModel.removeFromCache()
 
         // When
         viewModel.saveToCache(image: testImage)
 
         // Then - Verify image was saved by retrieving it
+        #expect(mockCacheManager.addToCacheCallCount == 1)
         let cachedImage = viewModel.getFromCache()
         #expect(cachedImage != nil)
     }
@@ -182,13 +187,15 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: nil
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
         // When
         viewModel.saveToCache(image: testImage)
 
         // Then - Should not crash and cache should remain empty
+        #expect(mockCacheManager.addToCacheCallCount == 0)
         let cachedImage = viewModel.getFromCache()
         #expect(cachedImage == nil)
     }
@@ -205,10 +212,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: URL(string: "https://test.com/image.jpeg")
         )
-        let viewModel = FeedDetailsViewModel(character: character)
-
-        // Clear cache first
-        viewModel.removeFromCache()
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // When
         let cachedImage = viewModel.getFromCache()
@@ -216,6 +221,7 @@ struct FeedDetailsViewModelTests {
         // Then
         #expect(cachedImage == nil)
         #expect(viewModel.cachedImage == nil)
+        #expect(mockCacheManager.getFromCacheCallCount == 1)
     }
 
     @MainActor
@@ -229,11 +235,11 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
-        // Clear cache and save image
-        viewModel.removeFromCache()
+        // Save image
         viewModel.saveToCache(image: testImage)
 
         // When
@@ -242,6 +248,7 @@ struct FeedDetailsViewModelTests {
         // Then
         #expect(cachedImage != nil)
         #expect(viewModel.cachedImage != nil)
+        #expect(mockCacheManager.getFromCacheCallCount == 1)
     }
 
     @MainActor
@@ -255,11 +262,11 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
-        // Clear cache and save image
-        viewModel.removeFromCache()
+        // Save image
         viewModel.saveToCache(image: testImage)
 
         // Verify initial state
@@ -282,7 +289,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: nil
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // When
         let cachedImage = viewModel.getFromCache()
@@ -290,6 +298,7 @@ struct FeedDetailsViewModelTests {
         // Then
         #expect(cachedImage == nil)
         #expect(viewModel.cachedImage == nil)
+        #expect(mockCacheManager.getFromCacheCallCount == 0)
     }
 
     // MARK: - Cache Remove Tests
@@ -305,19 +314,23 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
         // Save image first
         viewModel.saveToCache(image: testImage)
-        #expect(viewModel.getFromCache() != nil)
+        let _ = viewModel.getFromCache()
+        #expect(viewModel.cachedImage != nil)
 
         // When
         viewModel.removeFromCache()
 
         // Then
+        #expect(mockCacheManager.removeFromCacheCallCount == 1)
         let cachedImage = viewModel.getFromCache()
         #expect(cachedImage == nil)
+        #expect(viewModel.cachedImage == nil) // Should clear cachedImage state
     }
 
     @MainActor
@@ -330,13 +343,15 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: nil
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // When - Should not crash
         viewModel.removeFromCache()
 
         // Then - No error occurred
         #expect(viewModel.character.image == nil)
+        #expect(mockCacheManager.removeFromCacheCallCount == 0)
     }
 
     @MainActor
@@ -350,7 +365,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
 
         // When - Call remove multiple times
         viewModel.removeFromCache()
@@ -358,6 +374,7 @@ struct FeedDetailsViewModelTests {
         viewModel.removeFromCache()
 
         // Then - Should not crash
+        #expect(mockCacheManager.removeFromCacheCallCount == 3)
         let cachedImage = viewModel.getFromCache()
         #expect(cachedImage == nil)
     }
@@ -375,15 +392,16 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
-        // Clear cache
-        viewModel.removeFromCache()
+        // Verify cache is empty
         #expect(viewModel.getFromCache() == nil)
 
         // Save image
         viewModel.saveToCache(image: testImage)
+        #expect(mockCacheManager.addToCacheCallCount == 1)
 
         // Retrieve image
         let retrievedImage = viewModel.getFromCache()
@@ -392,7 +410,9 @@ struct FeedDetailsViewModelTests {
 
         // Remove image
         viewModel.removeFromCache()
+        #expect(mockCacheManager.removeFromCacheCallCount == 1)
         #expect(viewModel.getFromCache() == nil)
+        #expect(viewModel.cachedImage == nil) // Should clear cachedImage state
     }
 
     @MainActor
@@ -406,7 +426,8 @@ struct FeedDetailsViewModelTests {
             species: "Human",
             image: imageURL
         )
-        let viewModel = FeedDetailsViewModel(character: character)
+        let mockCacheManager = MockCacheManager()
+        let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
         let testImage = createTestImage()
 
         // When - Update brightness

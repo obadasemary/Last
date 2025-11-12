@@ -13,15 +13,17 @@ import UIKit
 final class FeedDetailsViewModel {
 
     let character: CharactersResponse
-    let cacheManager = CacheManager.instance
+    private let cacheManager: CacheManagerProtocol
     
     private(set) var cachedImage: UIImage? = nil
-    private(set) var brightness: CGFloat = 0.75
+    var brightness: CGFloat = 0.75
 
     init(
-        character: CharactersResponse
+        character: CharactersResponse,
+        cacheManager: CacheManagerProtocol = CacheManager.instance
     ) {
         self.character = character
+        self.cacheManager = cacheManager
     }
     
     func updateBrightness(_ value: CGFloat) {
@@ -36,6 +38,8 @@ final class FeedDetailsViewModel {
     func removeFromCache() {
         guard let imageName = character.image?.absoluteString else { return }
         cacheManager.removeFromCache(name: imageName)
+        // Clear cached image state when removing from cache
+        cachedImage = nil
     }
     
     @discardableResult 
