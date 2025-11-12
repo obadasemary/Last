@@ -16,12 +16,16 @@ final class FeedDetailsViewModel {
     let cacheManager = CacheManager.instance
     
     private(set) var cachedImage: UIImage? = nil
-    var brightness: CGFloat = 0.75
+    private(set) var brightness: CGFloat = 0.75
 
     init(
         character: CharactersResponse
     ) {
         self.character = character
+    }
+    
+    func updateBrightness(_ value: CGFloat) {
+        brightness = value
     }
     
     func saveToCache(image: UIImage) {
