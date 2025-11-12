@@ -82,7 +82,7 @@ struct FeedDetailsView: View {
                                 .cornerRadius(10)
                         }
                     }
-//                    .padding(.horizontal)
+                    
                     if let image = viewModel.cachedImage {
                         Image(uiImage: image)
                             .resizable()
@@ -90,8 +90,22 @@ struct FeedDetailsView: View {
                             .frame(width: 200, height: 200)
                             .clipped()
                             .cornerRadius(10)
+                            .brightness(viewModel.brightness - 0.5)
                     }
                     
+                    Slider(
+                        value: $viewModel.brightness,
+                        in: 0...1
+                    ) {
+                        Text("Brightness: \(Int(round(viewModel.brightness * 100)))%")
+                    } ticks: {
+                        SliderTick(0)
+                        SliderTick(0.25)
+                        SliderTick(0.5)
+                        SliderTick(0.75)
+                        SliderTick(1)
+                    }
+                    .padding()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
