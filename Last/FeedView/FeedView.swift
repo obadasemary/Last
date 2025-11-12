@@ -77,12 +77,16 @@ struct FeedView: View {
 ////                viewModel.loadDataWithCombine()
             }
             .task {
-                await viewModel.loadDataAsync()
+//                await viewModel.loadDataAsync()
+                await viewModel.loadDataAsyncFromCombine()
+//                await viewModel.loadDataAsyncFromCompletion()
             }
             .refreshable {
 //                viewModel.loadDataWithCompletionHandler()
 //                viewModel.loadDataWithCombine()
-                await viewModel.loadDataAsync()
+//                await viewModel.loadDataAsync()
+                await viewModel.loadDataAsyncFromCombine()
+//                await viewModel.loadDataAsyncFromCompletion()
             }
             .navigationTitle("Feeds")
         }

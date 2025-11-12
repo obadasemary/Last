@@ -23,4 +23,12 @@ class MockFeedRepository: FeedRepositoryProtocol {
     func fetchFeed(url: URL) async throws -> FeedEntity {
         FeedEntity.mock
     }
+    
+    func fetchFeedFromCompletion(url: URL) async throws -> FeedEntity {
+        FeedEntity.mock
+    }
+
+    func fetchFeedFromCombine(url: URL) async throws -> FeedEntity {
+        FeedEntity.mock
+    }
 }

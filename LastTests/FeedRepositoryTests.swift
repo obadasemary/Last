@@ -255,6 +255,88 @@ struct FeedRepositoryTests {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
+
+    // MARK: - Async Wrapper Tests (Learning)
+
+    @MainActor
+    @Test("FeedRepository fetchFeedFromCompletion - Success")
+    func fetchFeedFromCompletion_WithSuccess_ReturnsEntity() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .success(FeedEntity.mock)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeedFromCompletion(url: url)
+
+        // Then
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(result.info.pages == FeedEntity.mock.info.pages)
+        #expect(result.results.count == FeedEntity.mock.results.count)
+        #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+    }
+
+    @MainActor
+    @Test("FeedRepository fetchFeedFromCompletion - Network Error")
+    func fetchFeedFromCompletion_WithNetworkError_ThrowsError() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .failure(NetworkError.invalidResponse)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        do {
+            let _ = try await repository.fetchFeedFromCompletion(url: url)
+            Issue.record("Expected to throw error")
+        } catch let error as NetworkError {
+            #expect(error == .invalidResponse)
+            #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+        } catch {
+            Issue.record("Expected NetworkError but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("FeedRepository fetchFeedFromCombine - Success")
+    func fetchFeedFromCombine_WithSuccess_ReturnsEntity() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .success(FeedEntity.mock)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeedFromCombine(url: url)
+
+        // Then
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(result.info.pages == FeedEntity.mock.info.pages)
+        #expect(result.results.count == FeedEntity.mock.results.count)
+        #expect(mockNetworkService.executeCombineCallCount == 1)
+    }
+
+    @MainActor
+    @Test("FeedRepository fetchFeedFromCombine - Network Error")
+    func fetchFeedFromCombine_WithNetworkError_ThrowsError() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .failure(NetworkError.invalidResponse)
+        let repository = FeedRepository(networkService: mockNetworkService)
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        do {
+            let _ = try await repository.fetchFeedFromCombine(url: url)
+            Issue.record("Expected to throw error")
+        } catch let error as NetworkError {
+            #expect(error == .invalidResponse)
+            #expect(mockNetworkService.executeCombineCallCount == 1)
+        } catch {
+            Issue.record("Expected NetworkError but got \(error)")
+        }
+    }
 }
 
 // MARK: - MockNetworkService
