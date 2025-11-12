@@ -90,18 +90,14 @@ struct FeedDetailsView: View {
                             .frame(width: 200, height: 200)
                             .clipped()
                             .cornerRadius(10)
+                            // Brightness adjustment: SwiftUI's brightness modifier uses range -1 to 1,
+                            // where 0 is neutral. We map our 0-1 slider value to -0.5 to 0.5 range
+                            // to provide a balanced brightness adjustment effect.
                             .brightness(viewModel.brightness - 0.5)
                         
                         Slider(
-                            value: Binding(
-                                get: {
-                                    viewModel.brightness
-                                },
-                                set: { value in
-                                    viewModel.updateBrightness(value)
-                                }
-                            ),
-                            in: CGFloat(0)...CGFloat(1)
+                            value: $viewModel.brightness,
+                            in: 0...1
                         ) {
                             Text("Brightness: \(Int(round(viewModel.brightness * 100)))%")
                         } ticks: {
@@ -110,6 +106,19 @@ struct FeedDetailsView: View {
                             SliderTick(0.5)
                             SliderTick(0.75)
                             SliderTick(1)
+                        }
+                        .accessibilityLabel("Brightness slider")
+                        .accessibilityValue("\(Int(round(viewModel.brightness * 100))) percent")
+                        .accessibilityAdjustableAction { direction in
+                            let step: CGFloat = 0.05
+                            switch direction {
+                            case .increment:
+                                viewModel.brightness = min(1.0, viewModel.brightness + step)
+                            case .decrement:
+                                viewModel.brightness = max(0.0, viewModel.brightness - step)
+                            @unknown default:
+                                break
+                            }
                         }
                         .padding()
                     }
