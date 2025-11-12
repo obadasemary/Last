@@ -93,8 +93,15 @@ struct FeedDetailsView: View {
                             .brightness(viewModel.brightness - 0.5)
                         
                         Slider(
-                            value: $viewModel.brightness,
-                            in: 0...1
+                            value: Binding(
+                                get: {
+                                    viewModel.brightness
+                                },
+                                set: { value in
+                                    viewModel.updateBrightness(value)
+                                }
+                            ),
+                            in: CGFloat(0)...CGFloat(1)
                         ) {
                             Text("Brightness: \(Int(round(viewModel.brightness * 100)))%")
                         } ticks: {
