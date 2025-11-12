@@ -14,9 +14,9 @@ final class FeedDetailsViewModel {
 
     let character: CharactersResponse
     let cacheManager = CacheManager.instance
-//    private let cacheManager: CacheManagerProtocol
     
     private(set) var cachedImage: UIImage? = nil
+    var brightness: CGFloat = 0.75
 
     init(
         character: CharactersResponse
