@@ -62,6 +62,37 @@ final class FeedViewModel {
 
         isLoading = false
     }
+    
+    func loadDataAsyncFromCompletion() async {
+        isLoading = true
+        
+        do {
+            #if DEBUG
+            try? await Task.sleep(for: .seconds(3))
+            #endif
+            try await fetchFeedFromCompletion()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
+    }
+    
+    func loadDataAsyncFromCombine() async {
+        isLoading = true
+        
+        do {
+            #if DEBUG
+            try? await Task.sleep(for: .seconds(3))
+            #endif
+            try await fetchFeedFromCombine()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
+    }
+    
 }
 
 private extension FeedViewModel {
@@ -114,9 +145,50 @@ private extension FeedViewModel {
     }
 
     func fetchFeedAsync() async throws {
-        guard let url = Constants.url else { return }
+        guard let url = Constants.url else {
+            isLoading = false
+            return
+        }
 
         let response = try await feedUseCase.fetchFeed(url: url)
+        characters = response.results
+    }
+    
+    func fetchFeedFromCompletion() async throws {
+        guard let url = Constants.url else {
+            isLoading = false
+            return
+        }
+        
+        let response = try await withCheckedThrowingContinuation { continuation in
+            feedUseCase.fetchFeed(url: url) { result in
+                continuation.resume(with: result)
+            }
+        }
+        characters = response.results
+    }
+    
+    func fetchFeedFromCombine() async throws {
+        guard let url = Constants.url else {
+            return
+        }
+
+        let response: FeedEntity = try await withCheckedThrowingContinuation { continuation in
+            var cancellable: AnyCancellable?
+            cancellable = feedUseCase.fetchFeed(url: url)
+                .receive(on: RunLoop.main)
+                .sink(
+                    receiveCompletion: { completion in
+                        if case .failure(let failure) = completion {
+                            continuation.resume(throwing: failure)
+                        }
+                        cancellable?.cancel()
+                    }, receiveValue: { value in
+                        continuation.resume(returning: value)
+                        cancellable?.cancel()
+                    }
+                )
+        }
         characters = response.results
     }
 }
