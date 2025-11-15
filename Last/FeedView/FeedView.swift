@@ -17,6 +17,15 @@ struct FeedView: View {
         NavigationStack {
             ScrollView {
                 if viewModel.isLoading && viewModel.characters.isEmpty {
+                    
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.gray.opacity(0.05))
+                        .frame(height: 220)
+                        .padding(.horizontal)
+                        .redacted(reason: .placeholder)
+                        .shimmer()
+                        .padding(.bottom)
+                    
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(0..<4, id: \.self) { _ in
                             RoundedRectangle(cornerRadius: 12)
@@ -47,6 +56,8 @@ struct FeedView: View {
                         description: Text("Pull to refresh")
                     )
                 } else {
+                    CarouselView(characters: viewModel.characters)
+                    
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(viewModel.characters, id: \.id) { character in
                             NavigationLink {
@@ -69,6 +80,17 @@ struct FeedView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        // TODO: Implement settings action
+                    } label: {
+                        Image(systemName: "gear")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
