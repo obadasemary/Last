@@ -12,14 +12,24 @@ import Combine
 final class FeedViewModel {
 
     private let feedUseCase: FeedUseCaseProtocol
+    private let featureFlagManager: FeatureFlagManagerProtocol
     private var cancellables = Set<AnyCancellable>()
 
     private(set) var characters: [CharactersResponse] = []
     private(set) var isLoading: Bool = false
     private(set) var errorMessage: String?
 
-    init(feedUseCase: FeedUseCaseProtocol) {
+    init(
+        feedUseCase: FeedUseCaseProtocol,
+        featureFlagManager: FeatureFlagManagerProtocol = FeatureFlagManager.shared
+    ) {
         self.feedUseCase = feedUseCase
+        self.featureFlagManager = featureFlagManager
+    }
+    
+    /// Returns whether the enhanced carousel feature is enabled
+    var shouldUseEnhancedCarousel: Bool {
+        featureFlagManager.isEnabled(.enhancedCarousel)
     }
 
     // Completion handler version (currently active)
@@ -170,6 +180,7 @@ private extension FeedViewModel {
     
     func fetchFeedFromCombine() async throws {
         guard let url = Constants.url else {
+            isLoading = false
             return
         }
 
