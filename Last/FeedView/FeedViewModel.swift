@@ -31,6 +31,11 @@ final class FeedViewModel {
     var shouldUseEnhancedCarousel: Bool {
         featureFlagManager.isEnabled(.enhancedCarousel)
     }
+    
+    /// Returns whether the generic carousel feature is enabled
+    var shouldUseGenericCarousel: Bool {
+        featureFlagManager.isEnabled(.genericCarousel)
+    }
 
     // Completion handler version (currently active)
     func loadDataWithCompletionHandler() {
