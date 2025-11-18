@@ -25,7 +25,9 @@ final class FeedBuilder {
         
         let viewModel = FeedViewModel(feedUseCase: feedUseCase)
         let detailsBuilder = FeedDetailsBuilder()
-        return FeedView(viewModel: viewModel)
+        let featureFlagManager: FeatureFlagManagerProtocol = FeatureFlagManager.shared
+        
+        return FeedView(viewModel: viewModel, featureFlagManager: featureFlagManager)
             .environment(detailsBuilder)
     }
 }
