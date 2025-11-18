@@ -11,6 +11,7 @@ struct FeedView: View {
     
     @State var viewModel: FeedViewModel
     @Environment(FeedDetailsBuilder.self) private var feedDetailsBuilder
+    let featureFlagManager: FeatureFlagManagerProtocol
     var columns = [GridItem(.adaptive(minimum: 160), spacing: 20)]
     
     var body: some View {
@@ -56,7 +57,15 @@ struct FeedView: View {
                         description: Text("Pull to refresh")
                     )
                 } else {
-                    CarouselView(characters: viewModel.characters)
+                    if featureFlagManager.isEnabled(.enhancedCarousel) {
+                        EnhancedCarouselView(
+                            characters: viewModel.characters,
+                            configuration: .default,
+                            indicatorStyle: .dots
+                        )
+                    } else {
+                        CarouselView(characters: viewModel.characters)
+                    }
                     
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(viewModel.characters, id: \.id) { character in
@@ -118,4 +127,12 @@ struct FeedView: View {
 #Preview {
     let feedBuilder = FeedBuilder()
     feedBuilder.buildFeedView(isUsingMock: true)
+}
+
+#Preview("With Enhanced Carousel") {
+    let feedBuilder = FeedBuilder()
+    let view = feedBuilder.buildFeedView(isUsingMock: true)
+    // Enable enhanced carousel for preview
+    FeatureFlagManager.shared.setEnabled(.enhancedCarousel, enabled: true)
+    return view
 }
