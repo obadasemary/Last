@@ -11,7 +11,7 @@ struct FeedView: View {
     
     @State var viewModel: FeedViewModel
     @Environment(FeedDetailsBuilder.self) private var feedDetailsBuilder
-    let featureFlagManager: FeatureFlagManagerProtocol
+    @State private var showDebugSettings = false
     var columns = [GridItem(.adaptive(minimum: 160), spacing: 20)]
     
     var body: some View {
@@ -57,7 +57,7 @@ struct FeedView: View {
                         description: Text("Pull to refresh")
                     )
                 } else {
-                    if featureFlagManager.isEnabled(.enhancedCarousel) {
+                    if viewModel.shouldUseEnhancedCarousel {
                         EnhancedCarouselView(
                             characters: viewModel.characters,
                             configuration: .default,
@@ -95,13 +95,21 @@ struct FeedView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        // TODO: Implement settings action
+                        #if DEBUG
+                        showDebugSettings = true
+                        #else
+                        // In production, could show regular settings or do nothing
+                        #endif
                     } label: {
                         Image(systemName: "gear")
                             .font(.headline)
                             .foregroundStyle(.primary)
                     }
                 }
+            }
+            .sheet(isPresented: $showDebugSettings) {
+                let builder = DebugSettingsBuilder()
+                builder.buildDebugSettingsView()
             }
             .onAppear {
 //                viewModel.loadDataWithCompletionHandler()
@@ -131,8 +139,7 @@ struct FeedView: View {
 
 #Preview("With Enhanced Carousel") {
     let feedBuilder = FeedBuilder()
-    let view = feedBuilder.buildFeedView(isUsingMock: true)
     // Enable enhanced carousel for preview
     FeatureFlagManager.shared.setEnabled(.enhancedCarousel, enabled: true)
-    return view
+    return feedBuilder.buildFeedView(isUsingMock: true)
 }
