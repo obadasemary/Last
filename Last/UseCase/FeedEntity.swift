@@ -54,7 +54,7 @@ struct InfoResponse: Decodable, Sendable {
     let pages: Int
 }
 
-struct CharactersResponse: Decodable, Identifiable, Equatable, Sendable {
+struct CharactersResponse: Decodable, Identifiable, Equatable, Hashable, Sendable {
     let id: Int
     let name: String
     let species: String?

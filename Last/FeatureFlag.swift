@@ -10,15 +10,43 @@ import Foundation
 // MARK: - Feature Flag Enum
 
 /// Enumeration of available feature flags in the application
+/// 
+/// ## Adding a New Feature Flag
+/// 
+/// To add a new feature flag:
+/// 1. Add a new case to the enum following `camelCase` naming convention
+/// 2. Add a description in the `description` computed property
+/// 3. Add the flag to `defaultStates` in `FeatureFlagManager` (default: `false` for safety)
+/// 4. Use the flag in your code: `featureFlagManager.isEnabled(.yourNewFlag)`
+/// 
+/// Example:
+/// ```swift
+/// enum FeatureFlag: String, CaseIterable {
+///     case enhancedCarousel = "enhancedCarousel"
+///     case newFeature = "newFeature"  // Add new case
+///     
+///     var description: String {
+///         switch self {
+///         case .enhancedCarousel: return "..."
+///         case .newFeature: return "Description of new feature"  // Add description
+///         }
+///     }
+/// }
+/// ```
 enum FeatureFlag: String, CaseIterable {
     /// Enhanced carousel view with advanced customization options
     case enhancedCarousel = "enhancedCarousel"
+    
+    /// Generic carousel view that works with any data type and custom content
+    case genericCarousel = "genericCarousel"
     
     /// Returns a user-friendly description of the feature flag
     var description: String {
         switch self {
         case .enhancedCarousel:
             return "Enhanced Carousel View with advanced customization, animations, and accessibility features"
+        case .genericCarousel:
+            return "Generic Carousel View that works with any data type and provides flexible custom content builders"
         }
     }
 }
@@ -26,6 +54,14 @@ enum FeatureFlag: String, CaseIterable {
 // MARK: - Feature Flag Manager Protocol
 
 /// Protocol for managing feature flags
+/// 
+/// ## Usage Example
+/// ```swift
+/// let manager = FeatureFlagManager.shared
+/// if manager.isEnabled(.enhancedCarousel) {
+///     // Use enhanced carousel
+/// }
+/// ```
 protocol FeatureFlagManagerProtocol {
     /// Checks if a feature flag is enabled
     /// - Parameter flag: The feature flag to check
@@ -37,6 +73,17 @@ protocol FeatureFlagManagerProtocol {
     ///   - flag: The feature flag to set
     ///   - enabled: Whether the flag should be enabled
     func setEnabled(_ flag: FeatureFlag, enabled: Bool)
+    
+    /// Returns all feature flag states as a dictionary
+    /// - Returns: Dictionary mapping each flag to its enabled state
+    func getAllFlagStates() -> [FeatureFlag: Bool]
+    
+    /// Resets a feature flag to its default state
+    /// - Parameter flag: The feature flag to reset
+    func resetToDefault(_ flag: FeatureFlag)
+    
+    /// Resets all feature flags to their default states
+    func resetAllToDefaults()
 }
 
 // MARK: - Feature Flag Manager
@@ -54,7 +101,8 @@ final class FeatureFlagManager: FeatureFlagManagerProtocol {
     
     /// Default flag states (safe defaults - all disabled by default)
     private let defaultStates: [FeatureFlag: Bool] = [
-        .enhancedCarousel: false
+        .enhancedCarousel: false,
+        .genericCarousel: false
     ]
     
     // MARK: - Initialization
@@ -78,6 +126,25 @@ final class FeatureFlagManager: FeatureFlagManagerProtocol {
         let key = userDefaultsPrefix + flag.rawValue
         UserDefaults.standard.set(enabled, forKey: key)
     }
+    
+    func getAllFlagStates() -> [FeatureFlag: Bool] {
+        var states: [FeatureFlag: Bool] = [:]
+        for flag in FeatureFlag.allCases {
+            states[flag] = isEnabled(flag)
+        }
+        return states
+    }
+    
+    func resetToDefault(_ flag: FeatureFlag) {
+        let key = userDefaultsPrefix + flag.rawValue
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+    
+    func resetAllToDefaults() {
+        for flag in FeatureFlag.allCases {
+            resetToDefault(flag)
+        }
+    }
 }
 
 // MARK: - Mock Feature Flag Manager
@@ -100,6 +167,22 @@ final class MockFeatureFlagManager: FeatureFlagManagerProtocol {
     
     func setEnabled(_ flag: FeatureFlag, enabled: Bool) {
         flagStates[flag] = enabled
+    }
+    
+    func getAllFlagStates() -> [FeatureFlag: Bool] {
+        var states: [FeatureFlag: Bool] = [:]
+        for flag in FeatureFlag.allCases {
+            states[flag] = isEnabled(flag)
+        }
+        return states
+    }
+    
+    func resetToDefault(_ flag: FeatureFlag) {
+        flagStates.removeValue(forKey: flag)
+    }
+    
+    func resetAllToDefaults() {
+        flagStates.removeAll()
     }
 }
 
