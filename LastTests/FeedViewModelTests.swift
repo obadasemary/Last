@@ -247,4 +247,38 @@ struct FeedViewModelTests {
         #expect(errorViewModel.errorMessage != nil)
         #expect(errorViewModel.isLoading == false)
     }
+
+    // MARK: - Feature Flag Tests
+
+    @MainActor
+    @Test("FeedViewModel shouldUseEnhancedCarousel - Returns false by default")
+    func shouldUseEnhancedCarousel_ByDefault_ReturnsFalse() throws {
+        // Given
+        let mockUseCase = MockFeedUseCase(result: .success(FeedEntity.mock))
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let viewModel = FeedViewModel(
+            feedUseCase: mockUseCase,
+            featureFlagManager: mockFeatureFlagManager
+        )
+
+        // Then
+        #expect(viewModel.shouldUseEnhancedCarousel == false)
+    }
+
+    @MainActor
+    @Test("FeedViewModel shouldUseEnhancedCarousel - Returns true when enabled")
+    func shouldUseEnhancedCarousel_WhenEnabled_ReturnsTrue() throws {
+        // Given
+        let mockUseCase = MockFeedUseCase(result: .success(FeedEntity.mock))
+        let mockFeatureFlagManager = MockFeatureFlagManager(
+            defaultStates: [.enhancedCarousel: true]
+        )
+        let viewModel = FeedViewModel(
+            feedUseCase: mockUseCase,
+            featureFlagManager: mockFeatureFlagManager
+        )
+
+        // Then
+        #expect(viewModel.shouldUseEnhancedCarousel == true)
+    }
 }
