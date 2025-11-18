@@ -57,7 +57,24 @@ struct FeedView: View {
                         description: Text("Pull to refresh")
                     )
                 } else {
-                    if viewModel.shouldUseEnhancedCarousel {
+                    if viewModel.shouldUseGenericCarousel {
+                        GenericCarouselView(
+                            items: viewModel.characters,
+                            configuration: .default,
+                            indicatorStyle: .dots,
+                            onItemTapped: { character in
+                                // Navigation handled in content builder
+                            }
+                        ) { character, index in
+                            NavigationLink {
+                                feedDetailsBuilder.buildFeedDetailsView(character: character)
+                            } label: {
+                                CarouselCard(character: character)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal)
+                    } else if viewModel.shouldUseEnhancedCarousel {
                         EnhancedCarouselView(
                             characters: viewModel.characters,
                             configuration: .default,
@@ -141,6 +158,15 @@ struct FeedView: View {
 #Preview("With Enhanced Carousel") {
     let feedBuilder = FeedBuilder()
     let mockManager = MockFeatureFlagManager(defaultStates: [.enhancedCarousel: true])
+
+    feedBuilder
+        .buildFeedView(isUsingMock: true, featureFlagManager: mockManager)
+}
+
+#Preview("With Generic Carousel") {
+    let feedBuilder = FeedBuilder()
+    let mockManager = MockFeatureFlagManager(defaultStates: [.genericCarousel: true])
+
     feedBuilder
         .buildFeedView(isUsingMock: true, featureFlagManager: mockManager)
 }

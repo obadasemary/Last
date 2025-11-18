@@ -27,9 +27,7 @@ final class DebugSettingsViewModel {
     
     /// Loads all feature flag states from the manager
     func loadFeatureFlagStates() {
-        for flag in FeatureFlag.allCases {
-            featureFlagStates[flag] = featureFlagManager.isEnabled(flag)
-        }
+        featureFlagStates = featureFlagManager.getAllFlagStates()
     }
     
     /// Sets the enabled state for a specific feature flag
@@ -44,30 +42,9 @@ final class DebugSettingsViewModel {
     /// Resets all feature flags to their default values
     /// Removes UserDefaults overrides to restore default states
     func resetAllFlags() {
-        for flag in FeatureFlag.allCases {
-            // Remove UserDefaults override to restore default value
-            // This works for FeatureFlagManager by removing the key
-            // For MockFeatureFlagManager, we'll set to false (mock defaults)
-            resetFlagToDefault(flag)
-            // Reload state to reflect default value
-            featureFlagStates[flag] = featureFlagManager.isEnabled(flag)
-        }
-    }
-    
-    /// Resets a single flag to its default value by removing UserDefaults override
-    /// For FeatureFlagManager: Removes UserDefaults key to restore default
-    /// For MockFeatureFlagManager: Sets to false (mock doesn't support defaults restoration)
-    /// - Parameter flag: The feature flag to reset
-    private func resetFlagToDefault(_ flag: FeatureFlag) {
-        // Check if this is the real FeatureFlagManager (uses UserDefaults)
-        if featureFlagManager is FeatureFlagManager {
-            let key = "featureFlag_" + flag.rawValue
-            UserDefaults.standard.removeObject(forKey: key)
-        } else {
-            // For MockFeatureFlagManager, set to false (mock default)
-            // Note: This doesn't restore actual mock defaults, but is acceptable for testing
-            featureFlagManager.setEnabled(flag, enabled: false)
-        }
+        featureFlagManager.resetAllToDefaults()
+        // Reload states to reflect default values
+        featureFlagStates = featureFlagManager.getAllFlagStates()
     }
     
     /// Generates a string representation of all feature flag states
