@@ -10,7 +10,10 @@ import SwiftUI
 
 final class FeedBuilder {
     
-    func buildFeedView(isUsingMock: Bool = false) -> some View {
+    func buildFeedView(
+        isUsingMock: Bool = false,
+        featureFlagManager: FeatureFlagManagerProtocol = FeatureFlagManager.shared
+    ) -> some View {
         
         let feedRepository: FeedRepositoryProtocol
         
@@ -22,7 +25,6 @@ final class FeedBuilder {
         }
         
         let feedUseCase = FeedUseCase(feedRepository: feedRepository)
-        let featureFlagManager: FeatureFlagManagerProtocol = FeatureFlagManager.shared
         
         let viewModel = FeedViewModel(
             feedUseCase: feedUseCase,

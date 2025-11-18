@@ -63,6 +63,7 @@ struct FeedView: View {
                             configuration: .default,
                             indicatorStyle: .dots
                         )
+                        .padding(.horizontal)
                     } else {
                         CarouselView(characters: viewModel.characters)
                     }
@@ -139,7 +140,7 @@ struct FeedView: View {
 
 #Preview("With Enhanced Carousel") {
     let feedBuilder = FeedBuilder()
-    // Enable enhanced carousel for preview
-    FeatureFlagManager.shared.setEnabled(.enhancedCarousel, enabled: true)
-    return feedBuilder.buildFeedView(isUsingMock: true)
+    let mockManager = MockFeatureFlagManager(defaultStates: [.enhancedCarousel: true])
+    feedBuilder
+        .buildFeedView(isUsingMock: true, featureFlagManager: mockManager)
 }
