@@ -12,6 +12,49 @@ import UIKit
 import AppKit
 #endif
 
+// MARK: - Color Scheme Option
+
+/// Represents color scheme selection options
+private enum ColorSchemeOption: String, CaseIterable {
+    case system = "System"
+    case light = "Light"
+    case dark = "Dark"
+    
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .system:
+            return "circle.lefthalf.filled"
+        case .light:
+            return "sun.max.fill"
+        case .dark:
+            return "moon.fill"
+        }
+    }
+    
+    init?(colorScheme: ColorScheme?) {
+        if colorScheme == nil {
+            self = .system
+        } else if colorScheme == .light {
+            self = .light
+        } else if colorScheme == .dark {
+            self = .dark
+        } else {
+            return nil
+        }
+    }
+}
+
 struct DebugSettingsView: View {
     
     @State var viewModel: DebugSettingsViewModel
@@ -20,6 +63,7 @@ struct DebugSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                colorSchemeSection
                 featureFlagsSection
                 actionsSection
             }
@@ -43,6 +87,45 @@ struct DebugSettingsView: View {
             } message: {
                 Text("This will reset all feature flags to their default values. This action cannot be undone.")
             }
+        }
+    }
+    
+    // MARK: - Color Scheme Section
+    
+    private var colorSchemeSection: some View {
+        Section {
+            Picker("Color Scheme", selection: Binding(
+                get: {
+                    ColorSchemeOption(colorScheme: viewModel.preferredColorScheme) ?? .system
+                },
+                set: { option in
+                    viewModel.preferredColorScheme = option.colorScheme
+                }
+            )) {
+                ForEach(ColorSchemeOption.allCases, id: \.self) { option in
+                    HStack {
+                        Image(systemName: option.icon)
+                        Text(option.rawValue)
+                    }
+                    .tag(option)
+                }
+            }
+            .pickerStyle(.menu)
+            
+            // Show current selection
+            if let currentOption = ColorSchemeOption(colorScheme: viewModel.preferredColorScheme) {
+                HStack {
+                    Image(systemName: currentOption.icon)
+                        .foregroundStyle(.secondary)
+                    Text("Currently: \(currentOption.rawValue)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text("Appearance")
+        } footer: {
+            Text("Override the system color scheme. Set to 'System' to follow device settings.")
         }
     }
     
