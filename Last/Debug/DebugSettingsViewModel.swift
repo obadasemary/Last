@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @Observable
 final class DebugSettingsViewModel {
@@ -13,14 +14,30 @@ final class DebugSettingsViewModel {
     // MARK: - Properties
     
     private let featureFlagManager: FeatureFlagManagerProtocol
+    private let colorSchemeManager: ColorSchemeManagerProtocol
     
     private(set) var featureFlagStates: [FeatureFlag: Bool] = [:]
     var showingResetAlert = false
     
+    /// Current preferred color scheme (nil = system default)
+    /// This property triggers view updates when changed
+    var preferredColorScheme: ColorScheme? {
+        get {
+            colorSchemeManager.getPreferredColorScheme()
+        }
+        set {
+            colorSchemeManager.setPreferredColorScheme(newValue)
+        }
+    }
+    
     // MARK: - Initialization
     
-    init(featureFlagManager: FeatureFlagManagerProtocol) {
+    init(
+        featureFlagManager: FeatureFlagManagerProtocol,
+        colorSchemeManager: ColorSchemeManagerProtocol = ColorSchemeManager.shared
+    ) {
         self.featureFlagManager = featureFlagManager
+        self.colorSchemeManager = colorSchemeManager
     }
     
     // MARK: - Public Methods
