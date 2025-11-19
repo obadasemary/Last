@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import SwiftUI
 @testable import Last
 
 @Suite(.serialized)
@@ -226,6 +227,161 @@ struct DebugSettingsViewModelTests {
         #expect(viewModel.isFlagEnabled(.enhancedCarousel) == false)
     }
     
+    // MARK: - Color Scheme Tests
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Returns nil for system default")
+    func preferredColorScheme_ReturnsNilForSystemDefault() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: nil)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When/Then
+        #expect(viewModel.preferredColorScheme == nil)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Returns light when set")
+    func preferredColorScheme_ReturnsLightWhenSet() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: .light)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When/Then
+        #expect(viewModel.preferredColorScheme == .light)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Returns dark when set")
+    func preferredColorScheme_ReturnsDarkWhenSet() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: .dark)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When/Then
+        #expect(viewModel.preferredColorScheme == .dark)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Sets light mode")
+    func preferredColorScheme_SetsLightMode() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager()
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When
+        viewModel.preferredColorScheme = .light
+        
+        // Then
+        #expect(viewModel.preferredColorScheme == .light)
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == .light)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Sets dark mode")
+    func preferredColorScheme_SetsDarkMode() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager()
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When
+        viewModel.preferredColorScheme = .dark
+        
+        // Then
+        #expect(viewModel.preferredColorScheme == .dark)
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == .dark)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Sets system default (nil)")
+    func preferredColorScheme_SetsSystemDefault() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: .light)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When
+        viewModel.preferredColorScheme = nil
+        
+        // Then
+        #expect(viewModel.preferredColorScheme == nil)
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == nil)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Changes from light to dark")
+    func preferredColorScheme_ChangesFromLightToDark() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: .light)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When
+        viewModel.preferredColorScheme = .dark
+        
+        // Then
+        #expect(viewModel.preferredColorScheme == .dark)
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == .dark)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel preferredColorScheme - Changes from dark to system")
+    func preferredColorScheme_ChangesFromDarkToSystem() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager(preferredColorScheme: .dark)
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When
+        viewModel.preferredColorScheme = nil
+        
+        // Then
+        #expect(viewModel.preferredColorScheme == nil)
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == nil)
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel - Initializes with default ColorSchemeManager")
+    func initialization_UsesDefaultColorSchemeManager() throws {
+        // Given/When
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let viewModel = DebugSettingsViewModel(featureFlagManager: mockFeatureFlagManager)
+        
+        // Then - Should use shared ColorSchemeManager (system default initially)
+        // We can't directly test the shared instance, but we can verify it doesn't crash
+        let _ = viewModel.preferredColorScheme
+        #expect(true) // If we get here, initialization succeeded
+    }
+    
     // MARK: - Integration Tests
     
     @MainActor
@@ -255,6 +411,71 @@ struct DebugSettingsViewModelTests {
         for flag in FeatureFlag.allCases {
             #expect(viewModel.isFlagEnabled(flag) == false)
         }
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel - Full workflow with color scheme")
+    func fullWorkflow_WithColorScheme_WorksCorrectly() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager()
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When - Load feature flags
+        viewModel.loadFeatureFlagStates()
+        #expect(viewModel.isFlagEnabled(.enhancedCarousel) == false)
+        
+        // Set color scheme to dark
+        viewModel.preferredColorScheme = .dark
+        #expect(viewModel.preferredColorScheme == .dark)
+        
+        // Enable feature flag
+        viewModel.setFeatureFlag(.enhancedCarousel, enabled: true)
+        #expect(viewModel.isFlagEnabled(.enhancedCarousel) == true)
+        
+        // Change color scheme to light
+        viewModel.preferredColorScheme = .light
+        #expect(viewModel.preferredColorScheme == .light)
+        #expect(viewModel.isFlagEnabled(.enhancedCarousel) == true) // Flag should still be enabled
+        
+        // Reset to system default
+        viewModel.preferredColorScheme = nil
+        #expect(viewModel.preferredColorScheme == nil)
+        
+        // Then - Verify both systems work independently
+        #expect(viewModel.isFlagEnabled(.enhancedCarousel) == true) // Flag still enabled
+        #expect(viewModel.preferredColorScheme == nil) // Color scheme reset
+    }
+    
+    @MainActor
+    @Test("DebugSettingsViewModel - Multiple color scheme changes")
+    func multipleColorSchemeChanges_WorksCorrectly() throws {
+        // Given
+        let mockFeatureFlagManager = MockFeatureFlagManager()
+        let mockColorSchemeManager = MockColorSchemeManager()
+        let viewModel = DebugSettingsViewModel(
+            featureFlagManager: mockFeatureFlagManager,
+            colorSchemeManager: mockColorSchemeManager
+        )
+        
+        // When - Change color scheme multiple times
+        viewModel.preferredColorScheme = .light
+        #expect(viewModel.preferredColorScheme == .light)
+        
+        viewModel.preferredColorScheme = .dark
+        #expect(viewModel.preferredColorScheme == .dark)
+        
+        viewModel.preferredColorScheme = .light
+        #expect(viewModel.preferredColorScheme == .light)
+        
+        viewModel.preferredColorScheme = nil
+        #expect(viewModel.preferredColorScheme == nil)
+        
+        // Then - All changes should be reflected
+        #expect(mockColorSchemeManager.getPreferredColorScheme() == nil)
     }
 }
 
