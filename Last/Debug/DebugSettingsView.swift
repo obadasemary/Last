@@ -15,7 +15,7 @@ import AppKit
 // MARK: - Color Scheme Option
 
 /// Represents color scheme selection options
-private enum ColorSchemeOption: String, CaseIterable {
+enum ColorSchemeOption: String, CaseIterable {
     case system = "System"
     case light = "Light"
     case dark = "Dark"
@@ -57,8 +57,11 @@ private enum ColorSchemeOption: String, CaseIterable {
 
 struct DebugSettingsView: View {
     
-    @State var viewModel: DebugSettingsViewModel
+    @Bindable var viewModel: DebugSettingsViewModel
     @Environment(\.dismiss) private var dismiss
+    
+    // Use @Bindable on shared manager for observation
+    @Bindable private var colorSchemeManager = ColorSchemeManager.shared
     
     var body: some View {
         NavigationStack {
@@ -88,39 +91,38 @@ struct DebugSettingsView: View {
                 Text("This will reset all feature flags to their default values. This action cannot be undone.")
             }
         }
+        .preferredColorScheme(colorSchemeManager.preferredColorScheme)
     }
     
     // MARK: - Color Scheme Section
     
     private var colorSchemeSection: some View {
         Section {
-            Picker("Color Scheme", selection: Binding(
-                get: {
-                    ColorSchemeOption(colorScheme: viewModel.preferredColorScheme) ?? .system
-                },
-                set: { option in
-                    viewModel.preferredColorScheme = option.colorScheme
-                }
-            )) {
+            Picker(
+                "Color Scheme",
+                selection: $viewModel.colorSchemePreference
+            ) {
                 ForEach(ColorSchemeOption.allCases, id: \.self) { option in
                     HStack {
                         Image(systemName: option.icon)
                         Text(option.rawValue)
                     }
                     .tag(option)
+                    .id(option)
                 }
             }
             .pickerStyle(.menu)
+            .onChange(of: viewModel.colorSchemePreference) { oldValue, newValue in
+                viewModel.handleColorSchemeChange(oldValue: oldValue, newValue: newValue)
+            }
             
             // Show current selection
-            if let currentOption = ColorSchemeOption(colorScheme: viewModel.preferredColorScheme) {
-                HStack {
-                    Image(systemName: currentOption.icon)
-                        .foregroundStyle(.secondary)
-                    Text("Currently: \(currentOption.rawValue)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+            HStack {
+                Image(systemName: viewModel.colorSchemePreference.icon)
+                    .foregroundStyle(.secondary)
+                Text("Currently: \(viewModel.colorSchemePreference.rawValue)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         } header: {
             Text("Appearance")
