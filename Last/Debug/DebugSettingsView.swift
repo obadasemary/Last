@@ -43,13 +43,14 @@ enum ColorSchemeOption: String, CaseIterable {
     }
     
     init?(colorScheme: ColorScheme?) {
-        if colorScheme == nil {
+        switch colorScheme {
+        case .none:
             self = .system
-        } else if colorScheme == .light {
+        case .some(.light):
             self = .light
-        } else if colorScheme == .dark {
+        case .some(.dark):
             self = .dark
-        } else {
+        @unknown default:
             return nil
         }
     }
