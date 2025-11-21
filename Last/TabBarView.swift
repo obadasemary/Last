@@ -27,6 +27,13 @@ struct TabBarView: View {
                     Label("Feed UIKit", systemImage: "square.grid.2x2")
                 }
                 .tag(1)
+            
+            // Third Tab: News Feed (UIKit)
+            NewsFeedWrapper(isUsingMock: false)
+                .tabItem {
+                    Label("News", systemImage: "newspaper")
+                }
+                .tag(2)
         }
     }
 }
