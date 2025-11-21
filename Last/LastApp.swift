@@ -14,20 +14,9 @@ struct LastApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabBarView()
+                .preferredColorScheme(colorSchemeManager.preferredColorScheme)
                 .environment(colorSchemeManager)
         }
-    }
-}
-
-// MARK: - Content View
-
-/// Root content view that applies color scheme preference
-private struct ContentView: View {
-    @Environment(ColorSchemeManager.self) private var colorSchemeManager
-    
-    var body: some View {
-        TabBarView()
-            .preferredColorScheme(colorSchemeManager.getPreferredColorScheme())
     }
 }

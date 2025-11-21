@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+// MARK: - UserDefaults Keys
+
+/// UserDefaults keys used by ColorSchemeManager
+private enum UserDefaultsKey {
+    static let preferredColorScheme = "preferredColorScheme"
+}
+
 // MARK: - Color Scheme Manager Protocol
 
 /// Protocol for managing color scheme preferences
@@ -29,9 +36,6 @@ final class ColorSchemeManager: ColorSchemeManagerProtocol {
     
     /// Shared instance for app-wide color scheme management
     static let shared = ColorSchemeManager()
-    
-    /// UserDefaults key for storing color scheme preference
-    private let userDefaultsKey = "preferredColorScheme"
     
     /// Current preferred color scheme (for reactive updates)
     /// This property is observed by SwiftUI for automatic view updates
@@ -61,9 +65,11 @@ final class ColorSchemeManager: ColorSchemeManagerProtocol {
     // MARK: - Private Helpers
     
     private func loadFromUserDefaults() -> ColorScheme? {
-        guard let rawValue = UserDefaults.standard.string(forKey: userDefaultsKey),
-              let intValue = Int(rawValue) else {
-            return nil // System default
+        // Read as Int since we store as Int in saveToUserDefaults
+        let intValue = UserDefaults.standard.integer(forKey: UserDefaultsKey.preferredColorScheme)
+        // integer(forKey:) returns 0 if key doesn't exist, so check if key exists
+        guard UserDefaults.standard.object(forKey: UserDefaultsKey.preferredColorScheme) != nil else {
+            return nil // System default - key doesn't exist
         }
         
         return ColorScheme(rawValue: intValue)
@@ -71,9 +77,9 @@ final class ColorSchemeManager: ColorSchemeManagerProtocol {
     
     private func saveToUserDefaults(_ colorScheme: ColorScheme?) {
         if let colorScheme = colorScheme {
-            UserDefaults.standard.set(colorScheme.rawValue, forKey: userDefaultsKey)
+            UserDefaults.standard.set(colorScheme.rawValue, forKey: UserDefaultsKey.preferredColorScheme)
         } else {
-            UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+            UserDefaults.standard.removeObject(forKey: UserDefaultsKey.preferredColorScheme)
         }
     }
 }
