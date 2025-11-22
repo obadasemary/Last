@@ -2,6 +2,7 @@
 //  CarouselView+Modifiers.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Custom view modifiers for CarouselView styling and behavior
 //
 
@@ -153,14 +154,15 @@ extension View {
 // MARK: - Carousel Animation Modifier
 
 /// Configures animation behavior for carousel transitions
-struct CarouselAnimationModifier: ViewModifier {
+struct CarouselAnimationModifier<Value: Equatable>: ViewModifier {
     let animation: Animation
+    let trigger: Value
     let hapticFeedback: Bool
 
     func body(content: Content) -> some View {
         content
-            .animation(animation, value: UUID()) // Placeholder for binding
-            .onChange(of: UUID()) { _, _ in
+            .animation(animation, value: trigger)
+            .onChange(of: trigger) { _, _ in
                 if hapticFeedback {
                     let generator = UIImpactFeedbackGenerator(style: .light)
                     generator.impactOccurred()
@@ -172,16 +174,19 @@ struct CarouselAnimationModifier: ViewModifier {
 extension View {
     /// Configures animation for carousel page changes
     /// - Parameters:
+    ///   - trigger: The value to trigger animations (usually the current index)
     ///   - animation: The animation to use for transitions
     ///   - hapticFeedback: Whether to provide haptic feedback on page change
     /// - Returns: An animated carousel
-    func carouselAnimation(
-        _ animation: Animation = .easeInOut(duration: 0.3),
+    func carouselAnimation<Value: Equatable>(
+        trigger: Value,
+        animation: Animation = .easeInOut(duration: 0.3),
         hapticFeedback: Bool = true
     ) -> some View {
         self.modifier(
             CarouselAnimationModifier(
                 animation: animation,
+                trigger: trigger,
                 hapticFeedback: hapticFeedback
             )
         )
@@ -258,22 +263,22 @@ extension View {
             VStack(spacing: 24) {
                 Text("Modern Style")
                     .font(.headline)
-                CarouselView(characters: previewCharacters)
+                CarouselView(characters: FeedEntity.mock.results)
                     .carouselModernStyle()
 
                 Text("Compact Style")
                     .font(.headline)
-                CarouselView(characters: previewCharacters)
+                CarouselView(characters: FeedEntity.mock.results)
                     .carouselCompactStyle()
 
                 Text("Bordered Style")
                     .font(.headline)
-                CarouselView(characters: previewCharacters)
+                CarouselView(characters: FeedEntity.mock.results)
                     .carouselBorderedStyle(color: .purple)
 
                 Text("With Gradient Overlay")
                     .font(.headline)
-                CarouselView(characters: previewCharacters)
+                CarouselView(characters: FeedEntity.mock.results)
                     .carouselStyle()
                     .carouselOverlay(.gradient(colors: [.purple, .blue]))
             }
@@ -282,24 +287,3 @@ extension View {
         .environment(FeedDetailsBuilder())
     }
 }
-
-private let previewCharacters = [
-    CharactersResponse(
-        id: 1,
-        name: "Rick Sanchez",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 2,
-        name: "Morty Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 3,
-        name: "Summer Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    )
-]

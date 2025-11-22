@@ -3,6 +3,7 @@
 //  Neva
 //
 //  Created by Abdelrahman Mohamed on 01.11.2025.
+//  A horizontal scrolling carousel view for displaying characters
 //
 
 import SwiftUI

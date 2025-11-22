@@ -2,6 +2,7 @@
 //  EnhancedCarouselView.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Advanced carousel with additional features and customization options
 //
 
@@ -295,7 +296,7 @@ extension View {
 #Preview("Enhanced Carousel - Dots") {
     NavigationStack {
         EnhancedCarouselView(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .large,
             indicatorStyle: .dots,
             onPageChanged: { index in
@@ -313,7 +314,7 @@ extension View {
 #Preview("Enhanced Carousel - Bars") {
     NavigationStack {
         EnhancedCarouselView(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .default,
             indicatorStyle: .bars
         )
@@ -325,7 +326,7 @@ extension View {
 #Preview("Enhanced Carousel - Numbers") {
     NavigationStack {
         EnhancedCarouselView(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .default,
             indicatorStyle: .numbers
         )
@@ -333,54 +334,3 @@ extension View {
         .padding()
     }
 }
-
-#Preview("Enhanced Carousel - Thumbnails") {
-    NavigationStack {
-        EnhancedCarouselView(
-            characters: previewCharacters,
-            configuration: .default,
-            indicatorStyle: .thumbnail
-        )
-        .environment(FeedDetailsBuilder())
-        .padding()
-    }
-}
-
-#Preview("Enhanced Carousel - Empty State") {
-    NavigationStack {
-        EnhancedCarouselView(
-            characters: [],
-            configuration: .default,
-            indicatorStyle: .dots
-        )
-        .environment(FeedDetailsBuilder())
-        .padding()
-    }
-}
-
-private let previewCharacters = [
-    CharactersResponse(
-        id: 1,
-        name: "Rick Sanchez",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 2,
-        name: "Morty Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 3,
-        name: "Summer Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 4,
-        name: "Beth Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    )
-]
