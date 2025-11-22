@@ -2,6 +2,7 @@
 //  CarouselView+Accessibility.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Accessibility enhancements for CarouselView
 //
 
@@ -312,7 +313,7 @@ extension View {
 #Preview("Accessible Carousel") {
     NavigationStack {
         AccessibleCarouselView(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .large
         )
         .environment(FeedDetailsBuilder())
@@ -323,7 +324,7 @@ extension View {
 #Preview("Accessible Carousel - Reduced Motion") {
     NavigationStack {
         AccessibleCarouselView(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .default
         )
         .environment(FeedDetailsBuilder())
@@ -333,30 +334,9 @@ extension View {
 
 #Preview("Accessible Carousel - High Contrast") {
     NavigationStack {
-        CarouselView(characters: previewCharacters)
+        CarouselView(characters: FeedEntity.mock.results)
             .carouselHighContrast()
             .environment(FeedDetailsBuilder())
             .padding()
     }
 }
-
-private let previewCharacters = [
-    CharactersResponse(
-        id: 1,
-        name: "Rick Sanchez",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 2,
-        name: "Morty Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 3,
-        name: "Summer Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    )
-]

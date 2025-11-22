@@ -2,6 +2,7 @@
 //  GenericCarouselView.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Generic carousel view that works with any data type and custom content
 //
 
