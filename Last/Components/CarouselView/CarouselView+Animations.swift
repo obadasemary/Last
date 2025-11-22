@@ -2,6 +2,7 @@
 //  CarouselView+Animations.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Custom animations and transitions for CarouselView
 //
 
@@ -387,7 +388,7 @@ extension View {
 #Preview("Spring Animation") {
     NavigationStack {
         CarouselView.animated(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             animationStyle: .spring,
             transitionEffect: .scale
         )
@@ -399,7 +400,7 @@ extension View {
 #Preview("Bounce Animation") {
     NavigationStack {
         CarouselView.animated(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             animationStyle: .bounce,
             transitionEffect: .rotate
         )
@@ -411,7 +412,7 @@ extension View {
 #Preview("Parallax Effect") {
     NavigationStack {
         CarouselView.parallax(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .large
         )
         .environment(FeedDetailsBuilder())
@@ -422,7 +423,7 @@ extension View {
 #Preview("Zoom Effect") {
     NavigationStack {
         CarouselView.zoom(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .default
         )
         .environment(FeedDetailsBuilder())
@@ -433,7 +434,7 @@ extension View {
 #Preview("Bouncing Entrance") {
     NavigationStack {
         CarouselView.bouncing(
-            characters: previewCharacters,
+            characters: FeedEntity.mock.results,
             configuration: .hero
         )
         .environment(FeedDetailsBuilder())
@@ -448,7 +449,7 @@ extension View {
                 Text("Scale Transition")
                     .font(.headline)
                 CarouselView.animated(
-                    characters: previewCharacters,
+                    characters: FeedEntity.mock.results,
                     animationStyle: .spring,
                     transitionEffect: .scale
                 )
@@ -456,7 +457,7 @@ extension View {
                 Text("Rotate Transition")
                     .font(.headline)
                 CarouselView.animated(
-                    characters: previewCharacters,
+                    characters: FeedEntity.mock.results,
                     animationStyle: .smooth,
                     transitionEffect: .rotate
                 )
@@ -464,7 +465,7 @@ extension View {
                 Text("Fade Transition")
                     .font(.headline)
                 CarouselView.animated(
-                    characters: previewCharacters,
+                    characters: FeedEntity.mock.results,
                     animationStyle: .easeInOut,
                     transitionEffect: .fade
                 )
@@ -474,24 +475,3 @@ extension View {
         .environment(FeedDetailsBuilder())
     }
 }
-
-private let previewCharacters = [
-    CharactersResponse(
-        id: 1,
-        name: "Rick Sanchez",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 2,
-        name: "Morty Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 3,
-        name: "Summer Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    )
-]

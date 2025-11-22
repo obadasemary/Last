@@ -1,8 +1,9 @@
 //
 //  CarouselCard.swift
-//  Neva
+//  Last
 //
-//  Created by Abdelrahman Mohamed on 02.11.2025.
+//  Created by Abdelrahman Mohamed on 21.11.2025.
+//  A reusable card view for displaying character information in the carousel
 //
 
 import SwiftUI

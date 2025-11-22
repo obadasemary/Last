@@ -2,6 +2,7 @@
 //  CarouselConfiguration.swift
 //  Last
 //
+//  Created by Abdelrahman Mohamed on 21.11.2025.
 //  Configuration options for CarouselView customization
 //
 
@@ -251,7 +252,7 @@ extension CarouselView {
                     Text("Default")
                         .font(.headline)
                     ConfigurableCarouselView(
-                        characters: previewCharacters,
+                        characters: FeedEntity.mock.results,
                         configuration: .default
                     )
                 }
@@ -260,7 +261,7 @@ extension CarouselView {
                     Text("Compact")
                         .font(.headline)
                     ConfigurableCarouselView(
-                        characters: previewCharacters,
+                        characters: FeedEntity.mock.results,
                         configuration: .compact
                     )
                 }
@@ -269,7 +270,7 @@ extension CarouselView {
                     Text("Large")
                         .font(.headline)
                     ConfigurableCarouselView(
-                        characters: previewCharacters,
+                        characters: FeedEntity.mock.results,
                         configuration: .large
                     )
                 }
@@ -278,7 +279,7 @@ extension CarouselView {
                     Text("Full Width")
                         .font(.headline)
                     ConfigurableCarouselView(
-                        characters: previewCharacters,
+                        characters: FeedEntity.mock.results,
                         configuration: .fullWidth
                     )
                 }
@@ -287,7 +288,7 @@ extension CarouselView {
                     Text("Hero")
                         .font(.headline)
                     ConfigurableCarouselView(
-                        characters: previewCharacters,
+                        characters: FeedEntity.mock.results,
                         configuration: .hero
                     )
                 }
@@ -297,50 +298,3 @@ extension CarouselView {
         .environment(FeedDetailsBuilder())
     }
 }
-
-#Preview("Custom Configuration") {
-    NavigationStack {
-        ConfigurableCarouselView(
-            characters: previewCharacters,
-            configuration: CarouselConfiguration(
-                height: 250,
-                cornerRadius: 18,
-                horizontalPadding: 12,
-                topPadding: 10,
-                itemSpacing: 0,
-                showsPageIndicator: true,
-                pageIndicatorTintColor: .purple.opacity(0.5),
-                currentPageIndicatorTintColor: .purple,
-                transitionAnimation: .spring(response: 0.4, dampingFraction: 0.7),
-                enableHapticFeedback: true,
-                showsShadow: true,
-                shadowColor: .purple.opacity(0.2),
-                shadowRadius: 15,
-                shadowX: 0,
-                shadowY: 8
-            )
-        )
-        .environment(FeedDetailsBuilder())
-    }
-}
-
-private let previewCharacters = [
-    CharactersResponse(
-        id: 1,
-        name: "Rick Sanchez",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 2,
-        name: "Morty Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    ),
-    CharactersResponse(
-        id: 3,
-        name: "Summer Smith",
-        species: "Human",
-        image: URL(string: "https://picsum.photos/600/600")
-    )
-]
