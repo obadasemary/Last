@@ -12,23 +12,7 @@ final class MockNewsFeedRepository: NewsFeedRepositoryProtocol {
     
     var shouldFail = false
     
-    func fetchNewsFeed(url: URL, onComplete: @escaping (Result<NewsFeedEntity, Error>) -> Void) {
-        if shouldFail {
-            onComplete(.failure(NetworkError.invalidResponse))
-        } else {
-            onComplete(.success(NewsFeedEntity.mock))
-        }
-    }
-    
-    func fetchNewsFeed(url: URL) -> AnyPublisher<NewsFeedEntity, Error> {
-        if shouldFail {
-            return Fail(error: NetworkError.invalidResponse).eraseToAnyPublisher()
-        } else {
-            return Just(NewsFeedEntity.mock)
-                .setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
-        }
-    }
+
     
     func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity {
         if shouldFail {
