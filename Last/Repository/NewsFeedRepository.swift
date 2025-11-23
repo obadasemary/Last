@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 protocol NewsFeedRepositoryProtocol {
     func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity

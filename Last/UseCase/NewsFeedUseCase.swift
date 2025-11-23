@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 protocol NewsFeedUseCaseProtocol {
     func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity
