@@ -62,14 +62,7 @@ final class MockNewsFeedRepositoryForTests: NewsFeedRepositoryProtocol {
     var fetchNewsFeedCallCount = 0
     var lastFetchedURL: URL?
     
-    func fetchNewsFeed(url: URL, onComplete: @escaping (Result<NewsFeedEntity, Error>) -> Void) {
-        // Not used in UseCase async test, but required by protocol
-    }
-    
-    func fetchNewsFeed(url: URL) -> AnyPublisher<NewsFeedEntity, Error> {
-        // Not used in UseCase async test, but required by protocol
-        return Fail(error: NetworkError.invalidResponse).eraseToAnyPublisher()
-    }
+
     
     func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity {
         fetchNewsFeedCallCount += 1

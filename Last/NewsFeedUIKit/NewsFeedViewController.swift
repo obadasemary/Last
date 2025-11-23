@@ -73,17 +73,30 @@ final class NewsFeedViewController: UIViewController {
             await withObservationTracking {
                 _ = self.viewModel.episodes
                 _ = self.viewModel.isLoading
+                _ = self.viewModel.error
             } onChange: {
                 Task { @MainActor [weak self] in
                     guard let self else { return }
                     self.tableView.reloadData()
+                    
                     if !self.viewModel.isLoading {
                         self.refreshControl.endRefreshing()
                     }
+                    
+                    if let error = self.viewModel.error {
+                        self.showError(error)
+                    }
+                    
                     self.setupObservations()
                 }
             }
         }
+    }
+    
+    private func showError(_ error: Error) {
+        let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     @objc private func refreshData() {
@@ -111,7 +124,7 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
         
         var content = cell.defaultContentConfiguration()
         content.text = episode.name
-        content.secondaryText = "\(episode.episode) • \(episode.air_date)"
+        content.secondaryText = "\(episode.episode) • \(episode.airDate)"
         cell.contentConfiguration = content
         
         return cell
