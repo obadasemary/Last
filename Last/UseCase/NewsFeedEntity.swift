@@ -15,20 +15,22 @@ struct NewsFeedEntity: Decodable, Sendable {
 struct EpisodeResponse: Decodable, Identifiable, Equatable, Hashable, Sendable {
     let id: Int
     let name: String
-    let air_date: String
+    let airDate: String
     let episode: String
-    // let characters: [String] // URLs to characters, omitted for now as not needed for list
-    // let url: String
-    // let created: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name, episode
+        case airDate = "air_date"
+    }
 }
 
 extension NewsFeedEntity {
     static let mock = NewsFeedEntity(
         info: InfoResponse(count: 1, pages: 1),
         results: [
-            EpisodeResponse(id: 1, name: "Pilot", air_date: "December 2, 2013", episode: "S01E01"),
-            EpisodeResponse(id: 2, name: "Lawnmower Dog", air_date: "December 9, 2013", episode: "S01E02"),
-            EpisodeResponse(id: 3, name: "Anatomy Park", air_date: "December 16, 2013", episode: "S01E03")
+            EpisodeResponse(id: 1, name: "Pilot", airDate: "December 2, 2013", episode: "S01E01"),
+            EpisodeResponse(id: 2, name: "Lawnmower Dog", airDate: "December 9, 2013", episode: "S01E02"),
+            EpisodeResponse(id: 3, name: "Anatomy Park", airDate: "December 16, 2013", episode: "S01E03")
         ]
     )
 }
