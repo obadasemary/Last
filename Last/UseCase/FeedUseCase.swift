@@ -12,18 +12,37 @@ protocol FeedUseCaseProtocol {
     func fetchFeed(url: URL, onComplete: @escaping (Result<FeedEntity, Error>) -> Void)
     func fetchFeed(url: URL) -> AnyPublisher<FeedEntity, Error>
     func fetchFeed(url: URL) async throws -> FeedEntity
-    
+
     // Learning: Async/await wrapping different patterns
     func fetchFeedFromCompletion(url: URL) async throws -> FeedEntity
     func fetchFeedFromCombine(url: URL) async throws -> FeedEntity
 }
 
+enum FeedUseCaseError: Error, LocalizedError {
+    case noInternetAndNoCache
+
+    var errorDescription: String? {
+        switch self {
+        case .noInternetAndNoCache:
+            return "No internet connection and no cached data available"
+        }
+    }
+}
+
 final class FeedUseCase {
-    
+
     private let feedRepository: FeedRepositoryProtocol
-    
-    init(feedRepository: FeedRepositoryProtocol) {
+    private let cacheRepository: CacheRepositoryProtocol
+    private let networkReachability: NetworkReachabilityProtocol
+
+    init(
+        feedRepository: FeedRepositoryProtocol,
+        cacheRepository: CacheRepositoryProtocol,
+        networkReachability: NetworkReachabilityProtocol
+    ) {
         self.feedRepository = feedRepository
+        self.cacheRepository = cacheRepository
+        self.networkReachability = networkReachability
     }
 }
 
@@ -48,7 +67,29 @@ extension FeedUseCase: FeedUseCaseProtocol {
     }
     
     func fetchFeed(url: URL) async throws -> FeedEntity {
-        try await feedRepository.fetchFeed(url: url)
+        let isNetworkAvailable = await networkReachability.isNetworkAvailable()
+
+        if isNetworkAvailable {
+            // Try to fetch from network
+            do {
+                let feed = try await feedRepository.fetchFeed(url: url)
+                // Cache the fetched data
+                try? await cacheRepository.saveFeed(feed)
+                return feed
+            } catch {
+                // If network fetch fails, try to load from cache
+                if let cachedFeed = try? await cacheRepository.loadFeed() {
+                    return cachedFeed
+                }
+                throw error
+            }
+        } else {
+            // No network, load from cache
+            if let cachedFeed = try await cacheRepository.loadFeed() {
+                return cachedFeed
+            }
+            throw FeedUseCaseError.noInternetAndNoCache
+        }
     }
     
     func fetchFeedFromCompletion(url: URL) async throws -> FeedEntity {
