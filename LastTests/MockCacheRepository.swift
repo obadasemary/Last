@@ -9,6 +9,7 @@ import Foundation
 @testable import Last
 
 final class MockCacheRepository: CacheRepositoryProtocol {
+    
     var savedFeed: FeedEntity?
     var feedToReturn: FeedEntity?
     var shouldThrowError = false

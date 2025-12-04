@@ -18,31 +18,12 @@ protocol FeedUseCaseProtocol {
     func fetchFeedFromCombine(url: URL) async throws -> FeedEntity
 }
 
-enum FeedUseCaseError: Error, LocalizedError {
-    case noInternetAndNoCache
-
-    var errorDescription: String? {
-        switch self {
-        case .noInternetAndNoCache:
-            return "No internet connection and no cached data available"
-        }
-    }
-}
-
 final class FeedUseCase {
 
     private let feedRepository: FeedRepositoryProtocol
-    private let cacheRepository: CacheRepositoryProtocol
-    private let networkReachability: NetworkReachabilityProtocol
 
-    init(
-        feedRepository: FeedRepositoryProtocol,
-        cacheRepository: CacheRepositoryProtocol,
-        networkReachability: NetworkReachabilityProtocol
-    ) {
+    init(feedRepository: FeedRepositoryProtocol) {
         self.feedRepository = feedRepository
-        self.cacheRepository = cacheRepository
-        self.networkReachability = networkReachability
     }
 }
 
@@ -67,29 +48,7 @@ extension FeedUseCase: FeedUseCaseProtocol {
     }
     
     func fetchFeed(url: URL) async throws -> FeedEntity {
-        let isNetworkAvailable = await networkReachability.isNetworkAvailable()
-
-        if isNetworkAvailable {
-            // Try to fetch from network
-            do {
-                let feed = try await feedRepository.fetchFeed(url: url)
-                // Cache the fetched data
-                try? await cacheRepository.saveFeed(feed)
-                return feed
-            } catch {
-                // If network fetch fails, try to load from cache
-                if let cachedFeed = try? await cacheRepository.loadFeed() {
-                    return cachedFeed
-                }
-                throw error
-            }
-        } else {
-            // No network, load from cache
-            if let cachedFeed = try await cacheRepository.loadFeed() {
-                return cachedFeed
-            }
-            throw FeedUseCaseError.noInternetAndNoCache
-        }
+        try await feedRepository.fetchFeed(url: url)
     }
     
     func fetchFeedFromCompletion(url: URL) async throws -> FeedEntity {
