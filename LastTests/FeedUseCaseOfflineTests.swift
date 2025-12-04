@@ -24,11 +24,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = true
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -53,11 +49,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = true
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -81,11 +73,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = true
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -114,11 +102,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = false
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -142,18 +126,14 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = false
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
         do {
             let _ = try await useCase.fetchFeed(url: url)
             Issue.record("Expected to throw error")
-        } catch let error as FeedUseCaseError {
+        } catch let error as FeedRepositoryError {
             #expect(error == .noInternetAndNoCache)
             #expect(mockRepository.asyncFetchFeedCallCount == 0)
             #expect(mockCacheRepository.loadFeedCallCount == 1)
@@ -173,11 +153,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = false
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -225,11 +201,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = true
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -254,18 +226,14 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = false
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
         do {
             let _ = try await useCase.fetchFeed(url: url)
             Issue.record("Expected to throw error")
-        } catch let error as FeedUseCaseError {
+        } catch let error as FeedRepositoryError {
             let errorDescription = error.errorDescription
             #expect(errorDescription != nil)
             #expect(errorDescription?.contains("internet") == true || errorDescription?.contains("cache") == true)
@@ -284,11 +252,7 @@ struct FeedUseCaseOfflineTests {
         let mockReachability = MockNetworkReachability()
         mockReachability.isConnected = false
 
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When - Make multiple requests

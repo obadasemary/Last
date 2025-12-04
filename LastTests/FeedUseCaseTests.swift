@@ -21,14 +21,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -48,14 +41,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.invalidResponse)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -77,14 +63,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.decodingError)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -108,14 +87,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -139,14 +111,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.invalidResponse)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -172,14 +137,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.decodingError)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -207,14 +165,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -248,14 +199,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.invalidResponse)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -291,14 +235,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.decodingError)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -336,14 +273,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -363,14 +293,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.invalidResponse)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then
@@ -392,14 +315,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When
@@ -419,14 +335,7 @@ struct FeedUseCaseTests {
         // Given
         let mockRepository = MockFeedRepositoryForTests()
         mockRepository.result = .failure(NetworkError.invalidResponse)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let useCase = FeedUseCase(
-            feedRepository: mockRepository,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
-        )
+        let useCase = FeedUseCase(feedRepository: mockRepository)
         let url = URL(string: "https://test.com")!
 
         // When/Then

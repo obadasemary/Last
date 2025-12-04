@@ -9,6 +9,7 @@ import Foundation
 @testable import Last
 
 final class MockNetworkReachability: NetworkReachabilityProtocol {
+    
     var isConnected = true
     var isNetworkAvailableCallCount = 0
 
