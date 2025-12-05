@@ -92,8 +92,12 @@ extension FeedRepository: FeedRepositoryProtocol {
                 return feed
             } catch {
                 // If network fetch fails, try to load from cache
-                if let cachedFeed = try? await cacheRepository.loadFeed() {
-                    return cachedFeed
+                do {
+                    if let cachedFeed = try await cacheRepository.loadFeed() {
+                        return cachedFeed
+                    }
+                } catch let cacheError {
+                    print("Failed to load feed from cache after network failure: \(cacheError)")
                 }
                 throw error
             }
