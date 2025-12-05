@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import os.log
 
 protocol FeedRepositoryProtocol {
     func fetchFeed(url: URL, onComplete: @escaping (Result<FeedEntity, Error>) -> Void)
@@ -34,6 +35,7 @@ final class FeedRepository {
     private let networkService: NetworkServiceProtocol
     private let cacheRepository: CacheRepositoryProtocol
     private let networkReachability: NetworkReachabilityProtocol
+    private let logger = Logger(subsystem: "com.SamuraiStudios.Last", category: "FeedRepository")
 
     init(
         networkService: NetworkServiceProtocol,
@@ -83,23 +85,18 @@ extension FeedRepository: FeedRepositoryProtocol {
             // Try to fetch from network
             do {
                 let feed: FeedEntity = try await networkService.execute(URLRequest(url: url))
-                // Cache the fetched data
-                do {
-                    try await cacheRepository.saveFeed(feed)
-                } catch {
-                    print("Warning: Failed to save feed to cache: \(error)")
-                }
+                // Cache the fetched data (fire and forget - don't fail request if caching fails)
+                try? await cacheRepository.saveFeed(feed)
                 return feed
-            } catch {
+            } catch let networkError {
                 // If network fetch fails, try to load from cache
-                do {
-                    if let cachedFeed = try await cacheRepository.loadFeed() {
-                        return cachedFeed
-                    }
-                } catch let cacheError {
-                    print("Failed to load feed from cache after network failure: \(cacheError)")
+                if let cachedFeed = try? await cacheRepository.loadFeed() {
+                    logger.info("Network request failed, returning cached data")
+                    return cachedFeed
                 }
-                throw error
+                // No cache available, throw the original network error
+                logger.error("Network request failed and no cache available: \(networkError.localizedDescription)")
+                throw networkError
             }
         } else {
             // No network, load from cache
