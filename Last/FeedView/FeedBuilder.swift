@@ -15,7 +15,7 @@ final class FeedBuilder {
         featureFlagManager: FeatureFlagManagerProtocol = FeatureFlagManager.shared
     ) -> some View {
 
-        let feedUseCase = FeedServiceFactory.createFeedUseCase(isUsingMock: isUsingMock)
+        let feedUseCase = FeedUseCaseFactory.createFeedUseCase(isUsingMock: isUsingMock)
 
         let viewModel = FeedViewModel(
             feedUseCase: feedUseCase,

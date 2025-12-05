@@ -1,5 +1,5 @@
 //
-//  FeedServiceFactory.swift
+//  FeedUseCaseFactory.swift
 //  Last
 //
 //  Created by Claude Code on 05.12.2025.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-/// Factory for creating Feed-related service dependencies
-/// Centralizes the creation of FeedUseCase and its dependencies to avoid duplication
-final class FeedServiceFactory {
+/// Factory for creating FeedUseCase instances with their dependencies
+/// Centralizes the creation of FeedUseCase to avoid duplication across builders
+final class FeedUseCaseFactory {
 
     /// Creates a configured FeedUseCase with all its dependencies
     /// - Parameter isUsingMock: If true, returns a mock implementation for testing/previews
