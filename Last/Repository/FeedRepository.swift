@@ -84,7 +84,11 @@ extension FeedRepository: FeedRepositoryProtocol {
             do {
                 let feed: FeedEntity = try await networkService.execute(URLRequest(url: url))
                 // Cache the fetched data
-                try? await cacheRepository.saveFeed(feed)
+                do {
+                    try await cacheRepository.saveFeed(feed)
+                } catch {
+                    print("Warning: Failed to save feed to cache: \(error)")
+                }
                 return feed
             } catch {
                 // If network fetch fails, try to load from cache
