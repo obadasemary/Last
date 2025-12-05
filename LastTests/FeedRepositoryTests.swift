@@ -12,28 +12,48 @@ import Combine
 
 @Suite(.serialized)
 struct FeedRepositoryTests {
-    
+
+    // MARK: - Test Helpers
+
+    @MainActor
+    private func makeSUT(
+        networkResult: Result<FeedEntity, Error> = .success(FeedEntity.mock),
+        isOnline: Bool = true,
+        cachedFeed: FeedEntity? = nil
+    ) -> (sut: FeedRepository, mocks: (network: MockNetworkService, cache: MockCacheRepository, reachability: MockNetworkReachability)) {
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = networkResult
+
+        let mockCacheRepository = MockCacheRepository()
+        mockCacheRepository.feedToReturn = cachedFeed
+
+        let mockReachability = MockNetworkReachability()
+        mockReachability.isConnected = isOnline
+
+        let repository = FeedRepository(
+            networkService: mockNetworkService,
+            cacheRepository: mockCacheRepository,
+            networkReachability: mockReachability
+        )
+
+        return (repository, (mockNetworkService, mockCacheRepository, mockReachability))
+    }
+
     // MARK: - Async/Await Tests
     
     @MainActor
     @Test("FeedRepository async fetchFeed - Success with network")
     func asyncFetchFeed_WithSuccess_ReturnsEntity() async throws {
         // Given
-        let mockNetworkService = MockNetworkService()
-        mockNetworkService.result = .success(FeedEntity.mock)
-        let mockCacheRepository = MockCacheRepository()
-        let mockReachability = MockNetworkReachability()
-        mockReachability.isConnected = true
-        let repository = FeedRepository(
-            networkService: mockNetworkService,
-            cacheRepository: mockCacheRepository,
-            networkReachability: mockReachability
+        let (repository, (mockNetworkService, mockCacheRepository, _)) = makeSUT(
+            networkResult: .success(FeedEntity.mock),
+            isOnline: true
         )
         let url = URL(string: "https://test.com")!
-        
+
         // When
         let result = try await repository.fetchFeed(url: url)
-        
+
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
