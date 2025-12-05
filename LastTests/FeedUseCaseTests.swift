@@ -13,15 +13,25 @@ import Combine
 @Suite(.serialized)
 struct FeedUseCaseTests {
 
+    // MARK: - Test Helpers
+
+    @MainActor
+    private func makeSUT(
+        repositoryResult: Result<FeedEntity, Error>
+    ) -> (sut: FeedUseCase, mockRepository: MockFeedRepositoryForTests) {
+        let mockRepository = MockFeedRepositoryForTests()
+        mockRepository.result = repositoryResult
+        let useCase = FeedUseCase(feedRepository: mockRepository)
+        return (useCase, mockRepository)
+    }
+
     // MARK: - Async/Await Tests
 
     @MainActor
     @Test("FeedUseCase async fetchFeed - Success")
     func asyncFetchFeed_WithSuccess_ReturnsEntity() async throws {
         // Given
-        let mockRepository = MockFeedRepositoryForTests()
-        mockRepository.result = .success(FeedEntity.mock)
-        let useCase = FeedUseCase(feedRepository: mockRepository)
+        let (useCase, mockRepository) = makeSUT(repositoryResult: .success(FeedEntity.mock))
         let url = URL(string: "https://test.com")!
 
         // When
