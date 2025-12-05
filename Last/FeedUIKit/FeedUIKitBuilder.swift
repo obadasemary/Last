@@ -12,24 +12,7 @@ final class FeedUIKitBuilder {
     
     func buildFeedUIKit(isUsingMock: Bool = false) -> UINavigationController {
 
-        // Initialize cache repository and network reachability
-        let cacheRepository = CacheRepository(modelContext: SwiftDataManager.shared.modelContext)
-        let networkReachability = NetworkReachability()
-
-        let feedRepository: FeedRepositoryProtocol
-
-        if isUsingMock {
-            feedRepository = MockFeedRepository()
-        } else {
-            let networkService = NetworkService(session: .shared)
-            feedRepository = FeedRepository(
-                networkService: networkService,
-                cacheRepository: cacheRepository,
-                networkReachability: networkReachability
-            )
-        }
-
-        let feedUseCase = FeedUseCase(feedRepository: feedRepository)
+        let feedUseCase = FeedServiceFactory.createFeedUseCase(isUsingMock: isUsingMock)
         let viewModel = FeedViewModel(feedUseCase: feedUseCase)
         let feedDetailsBuilder = FeedDetailsBuilder()
 
