@@ -447,6 +447,144 @@ struct FeedRepositoryTests {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
+
+    // MARK: - Offline Scenario Tests
+
+    @MainActor
+    @Test("FeedRepository - Online, success, caches result")
+    func online_NetworkSuccess_CachesResult() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .success(FeedEntity.mock),
+            isOnline: true
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeed(url: url)
+
+        // Then
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(mockNetwork.executeCallCount == 1)
+        #expect(mockReachability.isNetworkAvailableCallCount == 1)
+        #expect(mockCache.saveFeedCallCount == 1)
+        #expect(mockCache.savedFeed?.info.count == FeedEntity.mock.info.count)
+    }
+
+    @MainActor
+    @Test("FeedRepository - Online, network fails, cache available, returns cache")
+    func online_NetworkFails_CacheAvailable_ReturnsCache() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .failure(NetworkError.invalidResponse),
+            isOnline: true,
+            cachedFeed: FeedEntity.mock
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeed(url: url)
+
+        // Then - Should return cached data
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(mockNetwork.executeCallCount == 1)
+        #expect(mockReachability.isNetworkAvailableCallCount == 1)
+        #expect(mockCache.loadFeedCallCount == 1)
+        #expect(mockCache.saveFeedCallCount == 0)  // Shouldn't try to cache failed network result
+    }
+
+    @MainActor
+    @Test("FeedRepository - Online, network fails, no cache, throws network error")
+    func online_NetworkFails_NoCache_ThrowsNetworkError() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .failure(NetworkError.invalidResponse),
+            isOnline: true,
+            cachedFeed: nil
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        do {
+            let _ = try await repository.fetchFeed(url: url)
+            Issue.record("Expected to throw NetworkError")
+        } catch let error as NetworkError {
+            #expect(error == .invalidResponse)
+            #expect(mockNetwork.executeCallCount == 1)
+            #expect(mockReachability.isNetworkAvailableCallCount == 1)
+            #expect(mockCache.loadFeedCallCount == 1)
+        } catch {
+            Issue.record("Expected NetworkError but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("FeedRepository - Offline, cache available, returns cache")
+    func offline_CacheAvailable_ReturnsCache() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .success(FeedEntity.mock),  // Shouldn't be called
+            isOnline: false,
+            cachedFeed: FeedEntity.mock
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeed(url: url)
+
+        // Then - Should return cached data without network call
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(mockNetwork.executeCallCount == 0)  // No network call when offline
+        #expect(mockReachability.isNetworkAvailableCallCount == 1)
+        #expect(mockCache.loadFeedCallCount == 1)
+    }
+
+    @MainActor
+    @Test("FeedRepository - Offline, no cache, throws noInternetAndNoCache")
+    func offline_NoCache_ThrowsNoInternetAndNoCache() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .success(FeedEntity.mock),  // Shouldn't be called
+            isOnline: false,
+            cachedFeed: nil
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When/Then
+        do {
+            let _ = try await repository.fetchFeed(url: url)
+            Issue.record("Expected to throw FeedRepositoryError.noInternetAndNoCache")
+        } catch let error as FeedRepositoryError {
+            #expect(error == .noInternetAndNoCache)
+            #expect(mockNetwork.executeCallCount == 0)  // No network call when offline
+            #expect(mockReachability.isNetworkAvailableCallCount == 1)
+            #expect(mockCache.loadFeedCallCount == 1)
+        } catch {
+            Issue.record("Expected FeedRepositoryError but got \(error)")
+        }
+    }
+
+    @MainActor
+    @Test("FeedRepository - Offline, multiple requests use cache efficiently")
+    func offline_MultipleRequests_UseCacheEfficiently() async throws {
+        // Given
+        let (repository, (mockNetwork, mockCache, mockReachability)) = makeSUT(
+            networkResult: .success(FeedEntity.mock),
+            isOnline: false,
+            cachedFeed: FeedEntity.mock
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When - Make multiple requests
+        let _ = try await repository.fetchFeed(url: url)
+        let _ = try await repository.fetchFeed(url: url)
+        let _ = try await repository.fetchFeed(url: url)
+
+        // Then - Network should never be called, cache called 3 times
+        #expect(mockNetwork.executeCallCount == 0)
+        #expect(mockReachability.isNetworkAvailableCallCount == 3)
+        #expect(mockCache.loadFeedCallCount == 3)
+    }
 }
 
 // MARK: - MockNetworkService
