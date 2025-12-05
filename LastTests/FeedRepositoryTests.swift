@@ -12,9 +12,9 @@ import Combine
 
 @Suite(.serialized)
 struct FeedRepositoryTests {
-
+    
     // MARK: - Async/Await Tests
-
+    
     @MainActor
     @Test("FeedRepository async fetchFeed - Success with network")
     func asyncFetchFeed_WithSuccess_ReturnsEntity() async throws {
@@ -30,10 +30,10 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When
         let result = try await repository.fetchFeed(url: url)
-
+        
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
@@ -41,7 +41,7 @@ struct FeedRepositoryTests {
         #expect(mockNetworkService.executeCallCount == 1)
         #expect(mockCacheRepository.saveFeedCallCount == 1)
     }
-
+    
     @MainActor
     @Test("FeedRepository async fetchFeed - Network Error")
     func asyncFetchFeed_WithNetworkError_ThrowsError() async throws {
@@ -56,7 +56,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _ = try await repository.fetchFeed(url: url)
@@ -68,7 +68,7 @@ struct FeedRepositoryTests {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     @MainActor
     @Test("FeedRepository async fetchFeed - Decoding Error")
     func asyncFetchFeed_WithDecodingError_ThrowsError() async throws {
@@ -83,7 +83,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _ = try await repository.fetchFeed(url: url)
@@ -95,9 +95,9 @@ struct FeedRepositoryTests {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     // MARK: - Completion Handler Tests
-
+    
     @MainActor
     @Test("FeedRepository completion fetchFeed - Success")
     func completionFetchFeed_WithSuccess_ReturnsEntity() async throws {
@@ -112,21 +112,22 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When
         let result: FeedEntity = try await withCheckedThrowingContinuation { continuation in
             repository.fetchFeed(url: url) { result in
                 continuation.resume(with: result)
             }
         }
-
+        
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
         #expect(result.results.count == FeedEntity.mock.results.count)
-        #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+        // Completion method now delegates to async method
+        #expect(mockNetworkService.executeCallCount == 1)
     }
-
+    
     @MainActor
     @Test("FeedRepository completion fetchFeed - Network Error")
     func completionFetchFeed_WithNetworkError_ReturnsFailure() async throws {
@@ -141,7 +142,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
@@ -152,12 +153,13 @@ struct FeedRepositoryTests {
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .invalidResponse)
-            #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+            // Completion method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     @MainActor
     @Test("FeedRepository completion fetchFeed - Decoding Error")
     func completionFetchFeed_WithDecodingError_ReturnsFailure() async throws {
@@ -172,7 +174,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _: FeedEntity = try await withCheckedThrowingContinuation { continuation in
@@ -183,14 +185,15 @@ struct FeedRepositoryTests {
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .decodingError)
-            #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+            // Completion method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     // MARK: - Combine Tests
-
+    
     @MainActor
     @Test("FeedRepository Combine fetchFeed - Success")
     func combineFetchFeed_WithSuccess_PublishesEntity() async throws {
@@ -205,7 +208,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When
         let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
         let result: FeedEntity = try await withCheckedThrowingContinuation { continuation in
@@ -222,14 +225,15 @@ struct FeedRepositoryTests {
                 }
             )
         }
-
+        
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
         #expect(result.results.count == FeedEntity.mock.results.count)
-        #expect(mockNetworkService.executeCombineCallCount == 1)
+        // Combine method now delegates to async method
+        #expect(mockNetworkService.executeCallCount == 1)
     }
-
+    
     @MainActor
     @Test("FeedRepository Combine fetchFeed - Network Error")
     func combineFetchFeed_WithNetworkError_PublishesError() async throws {
@@ -244,7 +248,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
         do {
@@ -265,12 +269,13 @@ struct FeedRepositoryTests {
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .invalidResponse)
-            #expect(mockNetworkService.executeCombineCallCount == 1)
+            // Combine method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     @MainActor
     @Test("FeedRepository Combine fetchFeed - Decoding Error")
     func combineFetchFeed_WithDecodingError_PublishesError() async throws {
@@ -285,7 +290,7 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         let publisher: AnyPublisher<FeedEntity, Error> = repository.fetchFeed(url: url)
         do {
@@ -306,14 +311,15 @@ struct FeedRepositoryTests {
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .decodingError)
-            #expect(mockNetworkService.executeCombineCallCount == 1)
+            // Combine method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     // MARK: - Async Wrapper Tests (Learning)
-
+    
     @MainActor
     @Test("FeedRepository fetchFeedFromCompletion - Success")
     func fetchFeedFromCompletion_WithSuccess_ReturnsEntity() async throws {
@@ -328,17 +334,18 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When
         let result = try await repository.fetchFeedFromCompletion(url: url)
-
+        
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
         #expect(result.results.count == FeedEntity.mock.results.count)
-        #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+        // Completion method now delegates to async method
+        #expect(mockNetworkService.executeCallCount == 1)
     }
-
+    
     @MainActor
     @Test("FeedRepository fetchFeedFromCompletion - Network Error")
     func fetchFeedFromCompletion_WithNetworkError_ThrowsError() async throws {
@@ -353,19 +360,20 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _ = try await repository.fetchFeedFromCompletion(url: url)
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .invalidResponse)
-            #expect(mockNetworkService.executeWithCompletionCallCount == 1)
+            // Completion method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
     }
-
+    
     @MainActor
     @Test("FeedRepository fetchFeedFromCombine - Success")
     func fetchFeedFromCombine_WithSuccess_ReturnsEntity() async throws {
@@ -380,17 +388,18 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When
         let result = try await repository.fetchFeedFromCombine(url: url)
-
+        
         // Then
         #expect(result.info.count == FeedEntity.mock.info.count)
         #expect(result.info.pages == FeedEntity.mock.info.pages)
         #expect(result.results.count == FeedEntity.mock.results.count)
-        #expect(mockNetworkService.executeCombineCallCount == 1)
+        // Combine method now delegates to async method
+        #expect(mockNetworkService.executeCallCount == 1)
     }
-
+    
     @MainActor
     @Test("FeedRepository fetchFeedFromCombine - Network Error")
     func fetchFeedFromCombine_WithNetworkError_ThrowsError() async throws {
@@ -405,14 +414,15 @@ struct FeedRepositoryTests {
             networkReachability: mockReachability
         )
         let url = URL(string: "https://test.com")!
-
+        
         // When/Then
         do {
             let _ = try await repository.fetchFeedFromCombine(url: url)
             Issue.record("Expected to throw error")
         } catch let error as NetworkError {
             #expect(error == .invalidResponse)
-            #expect(mockNetworkService.executeCombineCallCount == 1)
+            // Combine method now delegates to async method
+            #expect(mockNetworkService.executeCallCount == 1)
         } catch {
             Issue.record("Expected NetworkError but got \(error)")
         }
@@ -427,10 +437,10 @@ final class MockNetworkService: NetworkServiceProtocol {
     var executeCallCount = 0
     var executeWithCompletionCallCount = 0
     var executeCombineCallCount = 0
-
+    
     func execute<T>(_ request: URLRequest) async throws -> T where T : Decodable {
         executeCallCount += 1
-
+        
         switch result {
         case .success(let entity):
             if let typedResult = entity as? T {
@@ -442,10 +452,10 @@ final class MockNetworkService: NetworkServiceProtocol {
             throw error
         }
     }
-
+    
     func execute<T>(_ request: URLRequest, onCompleted: @escaping (Result<T, Error>) -> Void) where T : Decodable {
         executeWithCompletionCallCount += 1
-
+        
         switch result {
         case .success(let entity):
             if let typedResult = entity as? T {
@@ -457,10 +467,10 @@ final class MockNetworkService: NetworkServiceProtocol {
             onCompleted(.failure(error))
         }
     }
-
+    
     func execute<T>(_ request: URLRequest) -> AnyPublisher<T, Error> where T : Decodable {
         executeCombineCallCount += 1
-
+        
         switch result {
         case .success(let entity):
             if let typedResult = entity as? T {

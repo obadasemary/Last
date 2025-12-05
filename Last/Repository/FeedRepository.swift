@@ -52,13 +52,28 @@ extension FeedRepository: FeedRepositoryProtocol {
         url: URL,
         onComplete: @escaping (Result<FeedEntity, Error>) -> Void
     ) {
-        networkService.execute(URLRequest(url: url)) { (result: Result<FeedEntity, Error>) in
-            onComplete(result)
+        Task {
+            do {
+                let feed = try await fetchFeed(url: url)
+                onComplete(.success(feed))
+            } catch {
+                onComplete(.failure(error))
+            }
         }
     }
     
     func fetchFeed(url: URL) -> AnyPublisher<FeedEntity, Error> {
-        return networkService.execute(URLRequest(url: url))
+        return Future { promise in
+            Task {
+                do {
+                    let feed = try await self.fetchFeed(url: url)
+                    promise(.success(feed))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
     
     func fetchFeed(url: URL) async throws -> FeedEntity {
