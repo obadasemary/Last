@@ -12,7 +12,7 @@ final class FeedUIKitBuilder {
     
     func buildFeedUIKit(isUsingMock: Bool = false) -> UINavigationController {
 
-        let feedUseCase = FeedServiceFactory.createFeedUseCase(isUsingMock: isUsingMock)
+        let feedUseCase = FeedUseCaseFactory.createFeedUseCase(isUsingMock: isUsingMock)
         let viewModel = FeedViewModel(feedUseCase: feedUseCase)
         let feedDetailsBuilder = FeedDetailsBuilder()
 
