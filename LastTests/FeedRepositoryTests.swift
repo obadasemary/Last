@@ -585,6 +585,37 @@ struct FeedRepositoryTests {
         #expect(mockReachability.isNetworkAvailableCallCount == 3)
         #expect(mockCache.loadFeedCallCount == 3)
     }
+
+    @MainActor
+    @Test("FeedRepository - Cache save fails, still returns data successfully")
+    func cacheSaveFails_StillReturnsData() async throws {
+        // Given
+        let mockNetworkService = MockNetworkService()
+        mockNetworkService.result = .success(FeedEntity.mock)
+
+        let mockCacheRepository = MockCacheRepository()
+        mockCacheRepository.shouldThrowError = true  // Simulate cache save failure
+
+        let mockReachability = MockNetworkReachability()
+        mockReachability.isConnected = true
+
+        let repository = FeedRepository(
+            networkService: mockNetworkService,
+            cacheRepository: mockCacheRepository,
+            networkReachability: mockReachability
+        )
+        let url = URL(string: "https://test.com")!
+
+        // When
+        let result = try await repository.fetchFeed(url: url)
+
+        // Then - Should still return data even though caching failed
+        #expect(result.info.count == FeedEntity.mock.info.count)
+        #expect(mockNetworkService.executeCallCount == 1)
+        #expect(mockReachability.isNetworkAvailableCallCount == 1)
+        #expect(mockCacheRepository.saveFeedCallCount == 1)
+        // Cache save was attempted but failed silently (fire-and-forget behavior)
+    }
 }
 
 // MARK: - MockNetworkService
