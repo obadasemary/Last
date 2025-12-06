@@ -10,16 +10,33 @@ import SwiftUI
 struct FeedDetailsView: View {
 
     @State var viewModel: FeedDetailsViewModel
+    @Environment(VideoPlayerBuilder.self) private var videoPlayerBuilder
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // Image section
                 if let imageURL = viewModel.character.image {
                     ImageLoaderView(url: imageURL)
                         .frame(maxHeight: 400)
                         .aspectRatio(contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .accessibilityLabel("Character image of \(viewModel.character.name)")
+                }
+
+                // Video section (if video exists)
+                if let video = viewModel.character.video {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Video")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .padding(.horizontal)
+
+                        videoPlayerBuilder.buildVideoPlayerView(video: video)
+                            .frame(height: 300)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .padding(.horizontal)
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -155,9 +172,28 @@ struct FeedDetailsView: View {
                     id: 1,
                     name: "Rick Sanchez",
                     species: "Human",
-                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
+                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg"),
+                    video: .mock
                 )
             )
         )
+        .environment(VideoPlayerBuilder())
+    }
+}
+
+#Preview("Without Video") {
+    NavigationStack {
+        FeedDetailsView(
+            viewModel: FeedDetailsViewModel(
+                character: CharactersResponse(
+                    id: 1,
+                    name: "Rick Sanchez",
+                    species: "Human",
+                    image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg"),
+                    video: nil
+                )
+            )
+        )
+        .environment(VideoPlayerBuilder())
     }
 }

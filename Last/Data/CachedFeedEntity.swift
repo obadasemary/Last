@@ -46,12 +46,14 @@ final class CachedCharacter {
     var name: String
     var species: String?
     var imageURL: String?
+    var videoId: String?
 
-    init(characterId: Int, name: String, species: String?, imageURL: String?) {
+    init(characterId: Int, name: String, species: String?, imageURL: String?, videoId: String? = nil) {
         self.characterId = characterId
         self.name = name
         self.species = species
         self.imageURL = imageURL
+        self.videoId = videoId
     }
 
     convenience init(from character: CharactersResponse) {
@@ -59,7 +61,8 @@ final class CachedCharacter {
             characterId: character.id,
             name: character.name,
             species: character.species,
-            imageURL: character.image?.absoluteString
+            imageURL: character.image?.absoluteString,
+            videoId: character.video?.id
         )
     }
 
@@ -68,7 +71,8 @@ final class CachedCharacter {
             id: characterId,
             name: name,
             species: species,
-            image: imageURL.flatMap { URL(string: $0) }
+            image: imageURL.flatMap { URL(string: $0) },
+            video: nil  // Video is not cached in SwiftData, only referenced by ID
         )
     }
 }

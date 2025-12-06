@@ -13,11 +13,13 @@ final class FeedDetailsBuilder {
 
     func buildFeedDetailsView(
         character: CharactersResponse,
-        cacheManager: CacheManagerProtocol = CacheManager.instance
+        cacheManager: CacheManagerProtocol = CacheManager.instance,
+        injectMockVideo: Bool = false
     ) -> some View {
         let viewModel = FeedDetailsViewModel(
             character: character,
-            cacheManager: cacheManager
+            cacheManager: cacheManager,
+            injectMockVideo: injectMockVideo
         )
         return FeedDetailsView(viewModel: viewModel)
     }

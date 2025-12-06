@@ -343,13 +343,15 @@ private struct PreviewItem: Hashable, Identifiable {
                     id: 1,
                     name: "Rick Sanchez",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 2,
                     name: "Morty Smith",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 )
             ],
             configuration: .hero,
