@@ -50,7 +50,8 @@ struct CarouselCard: View {
             id: 1,
             name: "Obada",
             species: "Human",
-            image: URL(string: "https://picsum.photos/600/600")
+            image: URL(string: "https://picsum.photos/600/600"),
+            video: nil
         )
     )
 }

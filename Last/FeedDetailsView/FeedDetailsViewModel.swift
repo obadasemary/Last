@@ -14,15 +14,27 @@ final class FeedDetailsViewModel {
 
     let character: CharactersResponse
     private let cacheManager: CacheManagerProtocol
-    
+
     private(set) var cachedImage: UIImage? = nil
     var brightness: CGFloat = 0.75
 
     init(
         character: CharactersResponse,
-        cacheManager: CacheManagerProtocol = CacheManager.instance
+        cacheManager: CacheManagerProtocol = CacheManager.instance,
+        injectMockVideo: Bool = false
     ) {
-        self.character = character
+        // Inject mock video for testing if requested and character doesn't have one
+        if injectMockVideo && character.video == nil {
+            self.character = CharactersResponse(
+                id: character.id,
+                name: character.name,
+                species: character.species,
+                image: character.image,
+                video: .mock
+            )
+        } else {
+            self.character = character
+        }
         self.cacheManager = cacheManager
     }
     

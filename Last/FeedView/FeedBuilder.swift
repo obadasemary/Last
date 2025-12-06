@@ -22,8 +22,10 @@ final class FeedBuilder {
             featureFlagManager: featureFlagManager
         )
         let detailsBuilder = FeedDetailsBuilder()
+        let videoPlayerBuilder = VideoPlayerBuilder()
 
         return FeedView(viewModel: viewModel)
             .environment(detailsBuilder)
+            .environment(videoPlayerBuilder)
     }
 }
