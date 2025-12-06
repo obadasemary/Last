@@ -78,6 +78,15 @@ extension FeedRepository: FeedRepositoryProtocol {
         .eraseToAnyPublisher()
     }
     
+    /// Fetches feed data with offline fallback strategy
+    ///
+    /// Strategy:
+    /// 1. If online: Fetch from network → Cache result → Return data
+    ///    - On network failure: Try cache as fallback
+    /// 2. If offline: Return cached data
+    ///    - If no cache: Throw noInternetAndNoCache error
+    ///
+    /// This ensures users always get data when possible, with graceful degradation
     func fetchFeed(url: URL) async throws -> FeedEntity {
         let isNetworkAvailable = await networkReachability.isNetworkAvailable()
 
