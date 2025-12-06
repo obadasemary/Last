@@ -12,16 +12,21 @@ import Foundation
 final class FeedUseCaseFactory {
 
     /// Creates a configured FeedUseCase with all its dependencies
-    /// - Parameter isUsingMock: If true, returns a mock implementation for testing/previews
+    /// - Parameters:
+    ///   - isUsingMock: If true, returns a mock implementation for testing/previews
+    ///   - swiftDataManager: Optional SwiftDataManager for dependency injection (defaults to shared instance)
     /// - Returns: A fully configured FeedUseCase instance
-    static func createFeedUseCase(isUsingMock: Bool = false) -> FeedUseCaseProtocol {
+    static func createFeedUseCase(
+        isUsingMock: Bool = false,
+        swiftDataManager: SwiftDataManager = .shared
+    ) -> FeedUseCaseProtocol {
         let feedRepository: FeedRepositoryProtocol
 
         if isUsingMock {
             feedRepository = MockFeedRepository()
         } else {
             // Initialize cache repository and network reachability
-            let cacheRepository = CacheRepository(modelContext: SwiftDataManager.shared.modelContext)
+            let cacheRepository = CacheRepository(modelContext: swiftDataManager.modelContext)
             let networkReachability = NetworkReachability()
             let networkService = NetworkService(session: .shared)
 
