@@ -14,7 +14,7 @@ struct FeedEntity: Decodable, Sendable {
 }
 
 extension FeedEntity {
-    
+
     static let mock = FeedEntity(
         info: InfoResponse(
             count: 1,
@@ -25,25 +25,29 @@ extension FeedEntity {
                 id: 1,
                 name: "Obada",
                 species: "Engineer",
-                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
+                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg"),
+                video: .mock
             ),
             CharactersResponse(
                 id: 2,
                 name: "Sara",
                 species: "Engineer",
-                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/2.jpeg")
+                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/2.jpeg"),
+                video: .mockElephantsDream
             ),
             CharactersResponse(
                 id: 3,
                 name: "Omar",
                 species: "Engineer",
-                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/3.jpeg")
+                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/3.jpeg"),
+                video: .mockForBiggerBlazes
             ),
             CharactersResponse(
                 id: 4,
                 name: "Nazli",
                 species: "Engineer",
-                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/4.jpeg")
+                image: URL(string: "https://rickandmortyapi.com/api/character/avatar/4.jpeg"),
+                video: .mock
             )
         ]
     )
@@ -59,4 +63,5 @@ struct CharactersResponse: Decodable, Identifiable, Equatable, Hashable, Sendabl
     let name: String
     let species: String?
     let image: URL?
+    let video: VideoEntity?
 }

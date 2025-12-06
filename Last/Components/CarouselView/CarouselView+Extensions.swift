@@ -147,19 +147,22 @@ private struct CarouselViewWithControls: View {
                     id: 1,
                     name: "Rick Sanchez",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 2,
                     name: "Morty Smith",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 3,
                     name: "Summer Smith",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 )
             ],
             interval: 2.0
@@ -176,19 +179,22 @@ private struct CarouselViewWithControls: View {
                     id: 1,
                     name: "Rick Sanchez",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 2,
                     name: "Morty Smith",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 3,
                     name: "Summer Smith",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 )
             ]
         )

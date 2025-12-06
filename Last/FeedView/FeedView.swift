@@ -88,7 +88,11 @@ struct FeedView: View {
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(viewModel.characters, id: \.id) { character in
                             NavigationLink {
-                                feedDetailsBuilder.buildFeedDetailsView(character: character)
+                                feedDetailsBuilder
+                                    .buildFeedDetailsView(
+                                        character: character,
+                                        injectMockVideo: true
+                                    )
                             } label: {
                                 CharacterCardView(character: character)
                             }
@@ -101,7 +105,10 @@ struct FeedView: View {
                     LazyVStack {
                         ForEach(viewModel.characters, id: \.id) { character in
                             NavigationLink {
-                                feedDetailsBuilder.buildFeedDetailsView(character: character)
+                                feedDetailsBuilder.buildFeedDetailsView(
+                                    character: character,
+                                    injectMockVideo: true
+                                )
                             } label: {
                                 CharacterView(character: character)
                             }

@@ -23,7 +23,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test Character",
             species: "Human",
-            image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
+            image: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
 
@@ -47,7 +48,8 @@ struct FeedDetailsViewModelTests {
             id: 2,
             name: "Test Character",
             species: "Alien",
-            image: nil
+            image: nil,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
 
@@ -69,7 +71,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: URL(string: "https://test.com/image.jpeg")
+            image: URL(string: "https://test.com/image.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -90,7 +93,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: URL(string: "https://test.com/image.jpeg")
+            image: URL(string: "https://test.com/image.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -111,7 +115,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: URL(string: "https://test.com/image.jpeg")
+            image: URL(string: "https://test.com/image.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -132,7 +137,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: URL(string: "https://test.com/image.jpeg")
+            image: URL(string: "https://test.com/image.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -162,7 +168,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -185,7 +192,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: nil
+            image: nil,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -210,7 +218,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: URL(string: "https://test.com/image.jpeg")
+            image: URL(string: "https://test.com/image.jpeg"),
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -233,7 +242,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -260,7 +270,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -287,7 +298,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: nil
+            image: nil,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -312,7 +324,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -341,7 +354,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: nil
+            image: nil,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -363,7 +377,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -390,7 +405,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)
@@ -424,7 +440,8 @@ struct FeedDetailsViewModelTests {
             id: 1,
             name: "Test",
             species: "Human",
-            image: imageURL
+            image: imageURL,
+            video: nil
         )
         let mockCacheManager = MockCacheManager()
         let viewModel = FeedDetailsViewModel(character: character, cacheManager: mockCacheManager)

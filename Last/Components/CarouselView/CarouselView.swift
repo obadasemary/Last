@@ -50,25 +50,29 @@ struct CarouselView: View {
                     id: 1,
                     name: "Obada",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 2,
                     name: "Sara",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 3,
                     name: "Nazli",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 ),
                 CharactersResponse(
                     id: 4,
                     name: "Omar",
                     species: "Human",
-                    image: URL(string: "https://picsum.photos/600/600")
+                    image: URL(string: "https://picsum.photos/600/600"),
+                    video: nil
                 )
             ]
         )
