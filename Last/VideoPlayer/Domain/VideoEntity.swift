@@ -15,7 +15,7 @@ struct VideoEntity: Decodable, Identifiable, Equatable, Hashable, Sendable {
     let title: String?
     let qualities: [VideoQuality]
 
-    enum VideoQuality: Decodable, Equatable, Hashable, Sendable {
+    enum VideoQuality: Equatable, Hashable, Sendable {
         case low(URL)      // 360p
         case medium(URL)   // 720p
         case high(URL)     // 1080p
@@ -35,6 +35,35 @@ struct VideoEntity: Decodable, Identifiable, Equatable, Hashable, Sendable {
             case .high: return "1080p"
             case .hls: return "Auto (HLS)"
             }
+        }
+    }
+}
+
+// MARK: - VideoQuality Decodable Implementation
+extension VideoEntity.VideoQuality: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case url
+    }
+
+    enum QualityType: String, Decodable {
+        case low, medium, high, hls
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(QualityType.self, forKey: .type)
+        let url = try container.decode(URL.self, forKey: .url)
+
+        switch type {
+        case .low:
+            self = .low(url)
+        case .medium:
+            self = .medium(url)
+        case .high:
+            self = .high(url)
+        case .hls:
+            self = .hls(url)
         }
     }
 }
