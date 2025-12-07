@@ -47,13 +47,31 @@ final class CachedCharacter {
     var species: String?
     var imageURL: String?
     var videoId: String?
+    var videoURL: String?
+    var videoTitle: String?
+    var videoDuration: Double?
+    var videoThumbnailURL: String?
 
-    init(characterId: Int, name: String, species: String?, imageURL: String?, videoId: String? = nil) {
+    init(
+        characterId: Int,
+        name: String,
+        species: String?,
+        imageURL: String?,
+        videoId: String? = nil,
+        videoURL: String? = nil,
+        videoTitle: String? = nil,
+        videoDuration: Double? = nil,
+        videoThumbnailURL: String? = nil
+    ) {
         self.characterId = characterId
         self.name = name
         self.species = species
         self.imageURL = imageURL
         self.videoId = videoId
+        self.videoURL = videoURL
+        self.videoTitle = videoTitle
+        self.videoDuration = videoDuration
+        self.videoThumbnailURL = videoThumbnailURL
     }
 
     convenience init(from character: CharactersResponse) {
@@ -62,17 +80,39 @@ final class CachedCharacter {
             name: character.name,
             species: character.species,
             imageURL: character.image?.absoluteString,
-            videoId: character.video?.id
+            videoId: character.video?.id,
+            videoURL: character.video?.url.absoluteString,
+            videoTitle: character.video?.title,
+            videoDuration: character.video?.duration,
+            videoThumbnailURL: character.video?.thumbnailURL?.absoluteString
         )
     }
 
     func toCharactersResponse() -> CharactersResponse {
-        CharactersResponse(
+        // Reconstruct VideoEntity from cached data if available
+        let video: VideoEntity? = {
+            guard let videoId = videoId,
+                  let videoURLString = videoURL,
+                  let videoURL = URL(string: videoURLString) else {
+                return nil
+            }
+
+            return VideoEntity(
+                id: videoId,
+                url: videoURL,
+                thumbnailURL: videoThumbnailURL.flatMap { URL(string: $0) },
+                duration: videoDuration,
+                title: videoTitle,
+                qualities: [.medium(videoURL)] // Store primary quality, others can be derived from HLS if needed
+            )
+        }()
+
+        return CharactersResponse(
             id: characterId,
             name: name,
             species: species,
             image: imageURL.flatMap { URL(string: $0) },
-            video: nil  // Video is not cached in SwiftData, only referenced by ID
+            video: video
         )
     }
 }
