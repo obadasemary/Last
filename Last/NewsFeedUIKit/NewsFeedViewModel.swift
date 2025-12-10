@@ -10,31 +10,33 @@ import Observation
 
 @Observable
 final class NewsFeedViewModel {
-    
+
     private(set) var episodes: [EpisodeResponse] = []
     private(set) var isLoading = false
     private(set) var error: Error?
-    
+    private(set) var isFromRemote = true
+
     private let useCase: NewsFeedUseCaseProtocol
-    
+
     init(useCase: NewsFeedUseCaseProtocol) {
         self.useCase = useCase
     }
-    
+
     @MainActor
     func loadData() async {
         guard let url = Constants.episodesUrl else { return }
-        
+
         isLoading = true
         error = nil
-        
+
         do {
-            let entity = try await useCase.fetchNewsFeed(url: url)
+            let (entity, isFromRemote) = try await useCase.fetchNewsFeed(url: url)
             episodes = entity.results
+            self.isFromRemote = isFromRemote
         } catch {
             self.error = error
         }
-        
+
         isLoading = false
     }
 }

@@ -18,15 +18,17 @@ struct NewsFeedViewModelTests {
         // Given
         let mockUseCase = MockNewsFeedUseCase() // Using the one from main target
         mockUseCase.shouldFail = false
+        mockUseCase.isFromRemote = true
         let viewModel = NewsFeedViewModel(useCase: mockUseCase)
-        
+
         // When
         await viewModel.loadData()
-        
+
         // Then
         #expect(viewModel.episodes.count == NewsFeedEntity.mock.results.count)
         #expect(viewModel.isLoading == false)
         #expect(viewModel.error == nil)
+        #expect(viewModel.isFromRemote == true)
     }
     
     @MainActor

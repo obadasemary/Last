@@ -19,7 +19,9 @@ final class SwiftDataManager {
         do {
             let schema = Schema([
                 CachedFeedEntity.self,
-                CachedCharacter.self
+                CachedCharacter.self,
+                CachedNewsFeedEntity.self,
+                CachedEpisode.self
             ])
 
             let modelConfiguration = ModelConfiguration(

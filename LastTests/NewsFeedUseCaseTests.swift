@@ -18,15 +18,16 @@ struct NewsFeedUseCaseTests {
     func fetchNewsFeed_WithSuccess_ReturnsEntity() async throws {
         // Given
         let mockRepository = MockNewsFeedRepositoryForTests()
-        mockRepository.result = .success(NewsFeedEntity.mock)
+        mockRepository.result = .success((NewsFeedEntity.mock, isFromRemote: true))
         let useCase = NewsFeedUseCase(repository: mockRepository)
         let url = URL(string: "https://test.com")!
-        
+
         // When
-        let result = try await useCase.fetchNewsFeed(url: url)
-        
+        let (entity, isFromRemote) = try await useCase.fetchNewsFeed(url: url)
+
         // Then
-        #expect(result.results.count == NewsFeedEntity.mock.results.count)
+        #expect(entity.results.count == NewsFeedEntity.mock.results.count)
+        #expect(isFromRemote == true)
         #expect(mockRepository.fetchNewsFeedCallCount == 1)
         #expect(mockRepository.lastFetchedURL == url)
     }
@@ -57,17 +58,17 @@ struct NewsFeedUseCaseTests {
 // MARK: - MockNewsFeedRepositoryForTests
 
 final class MockNewsFeedRepositoryForTests: NewsFeedRepositoryProtocol {
-    
-    var result: Result<NewsFeedEntity, Error> = .success(NewsFeedEntity.mock)
+
+    var result: Result<(NewsFeedEntity, isFromRemote: Bool), Error> = .success((NewsFeedEntity.mock, isFromRemote: true))
     var fetchNewsFeedCallCount = 0
     var lastFetchedURL: URL?
-    
 
-    
-    func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity {
+
+
+    func fetchNewsFeed(url: URL) async throws -> (NewsFeedEntity, isFromRemote: Bool) {
         fetchNewsFeedCallCount += 1
         lastFetchedURL = url
-        
+
         switch result {
         case .success(let entity):
             return entity
