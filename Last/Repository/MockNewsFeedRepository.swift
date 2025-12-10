@@ -8,13 +8,14 @@
 import Foundation
 
 final class MockNewsFeedRepository: NewsFeedRepositoryProtocol {
-    
+
     var shouldFail = false
-    
-    func fetchNewsFeed(url: URL) async throws -> NewsFeedEntity {
+    var isFromRemote = true
+
+    func fetchNewsFeed(url: URL) async throws -> (NewsFeedEntity, isFromRemote: Bool) {
         if shouldFail {
             throw NetworkError.invalidResponse
         }
-        return NewsFeedEntity.mock
+        return (NewsFeedEntity.mock, isFromRemote: isFromRemote)
     }
 }
