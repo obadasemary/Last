@@ -1,5 +1,7 @@
 # Last - Rick and Morty Character Explorer
 
+[![iOS CI](https://github.com/obadasemary/Last/actions/workflows/ios-ci.yml/badge.svg)](https://github.com/obadasemary/Last/actions/workflows/ios-ci.yml)
+
 A SwiftUI iOS application demonstrating Clean Architecture principles with both SwiftUI and UIKit implementations. Features character data from the Rick and Morty API with advanced image caching capabilities.
 
 ## Features
