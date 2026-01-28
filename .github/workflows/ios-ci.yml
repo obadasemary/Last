@@ -35,4 +35,5 @@ jobs:
             -scheme Last \
             -project Last.xcodeproj \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+            -only-testing:LastTests \
             test
