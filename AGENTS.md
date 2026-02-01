@@ -33,6 +33,12 @@ Usage notes:
 <location>project</location>
 </skill>
 
+<skill>
+<name>xcodebuildmcp</name>
+<description>Official skill for XcodeBuildMCP (preferred). Use when doing iOS/macOS/watchOS/tvOS/visionOS work (build, test, run, debug, log, UI automation).</description>
+<location>project</location>
+</skill>
+
 </available_skills>
 <!-- SKILLS_TABLE_END -->
 
