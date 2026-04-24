@@ -4,145 +4,90 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a SwiftUI iOS application that displays character data fetched from the Rick and Morty API. The app follows Clean Architecture principles with a clear separation of concerns across layers.
-
-## Architecture
-
-### Clean Architecture Layers
-
-The codebase implements Clean Architecture with the following layers:
-
-1. **Presentation Layer**
-   - `*View.swift`: SwiftUI views
-   - `*ViewModel.swift`: Observable view models using Swift's `@Observable` macro
-   - `*Builder.swift`: Factory pattern for constructing views with dependencies
-
-2. **Domain Layer**
-   - `*UseCase.swift`: Business logic layer with protocol-first design
-   - `*Entity.swift`: Domain models (Decodable, Sendable)
-
-3. **Data Layer**
-   - `*Repository.swift`: Data access abstraction with protocols
-   - `NetworkService.swift`: Generic network layer for API calls
-   - `Mock*Repository.swift`: Mock implementations for testing/previews
-
-### Dependency Injection Pattern
-
-The app uses Builder pattern for dependency injection:
-- `FeedBuilder` constructs the main feed view with all dependencies
-- `FeedDetailsBuilder` constructs detail views (injected as SwiftUI environment object)
-- Builders support mock mode via `isUsingMock` parameter for previews and testing
-
-### Key Architectural Decisions
-
-- **Protocol-first design**: All major components have protocol definitions (*Protocol)
-- **Async/await**: All network operations use structured concurrency
-- **Sendable compliance**: All data models conform to Sendable for thread safety
-- **SwiftUI @Observable**: Modern observation using Swift macros instead of ObservableObject
+SwiftUI iOS app displaying Rick and Morty character data with a full Clean Architecture stack. Notably ships **parallel SwiftUI and UIKit implementations** of the same features (Feed, NewsFeed) as an educational comparison — both live in the app under separate tabs.
 
 ## Development Commands
 
-### Building and Running
-
 ```bash
-# Build the project
-xcodebuild -scheme Last -project Last.xcodeproj build
+# Build
+xcodebuild -scheme Last -project Last.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17' build
 
-# Run tests
-xcodebuild -scheme Last -project Last.xcodeproj test
+# Run all tests (unit only — UI tests intentionally skipped for speed)
+xcodebuild -scheme Last -project Last.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:LastTests test
 
-# Run specific test
-xcodebuild -scheme Last -project Last.xcodeproj -only-testing:LastTests/LastTests/fetchFeed_OnSuccess test
+# Run a single test
+xcodebuild -scheme Last -project Last.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:LastTests/LastTests/fetchFeed_OnSuccess test
 ```
 
-### Testing
+A pre-commit hook runs build + unit tests automatically and blocks the commit on failure. Bypass only in exceptional cases: `git commit --no-verify`.
 
-The project uses Swift Testing framework (not XCTest). Test files use:
-- `@Test` attribute for test functions
-- `#expect` for assertions
-- `@MainActor` when testing view models
+## Architecture
 
-## Development Workflow
+### Layer Structure
 
-### Pre-Commit Checks
-
-**IMPORTANT**: Always build and run tests before committing code. A git pre-commit hook is configured to automatically:
-1. Build the project for iOS Simulator
-2. Run unit tests (UI tests are skipped for speed)
-3. Block the commit if either fails
-
-This ensures no broken code enters the repository.
-
-### Manual Build and Test
-
-If you need to run checks manually:
-
-```bash
-# Build the project
-xcodebuild -scheme Last -project Last.xcodeproj build
-
-# Run all tests
-xcodebuild -scheme Last -project Last.xcodeproj test
-
-# Both commands must succeed before committing
+```text
+View → ViewModel → UseCase → Repository → NetworkService / CacheRepository
 ```
 
-### Bypassing Pre-Commit Hook (Not Recommended)
+Each layer depends only on **protocols** from the layer below (`*Protocol` suffix). All data models are `Decodable & Sendable`.
 
-Only in exceptional circumstances:
-```bash
-git commit --no-verify -m "your message"
+| Layer        | Files                                                                | Notes                                |
+| ------------ | -------------------------------------------------------------------- | ------------------------------------ |
+| Presentation | `*View.swift`, `*ViewModel.swift`, `*Builder.swift`                  | `@Observable @MainActor` view models |
+| Domain       | `*UseCase.swift`, `*Entity.swift`                                    | Pure Swift, no framework deps        |
+| Data         | `*Repository.swift`, `NetworkService.swift`, `CacheRepository.swift` | SwiftData + network                  |
+
+### Dependency Injection
+
+`FeedUseCaseFactory` is the single entry point that chains the full dependency graph (Network → Cache → Repository → UseCase). Builders call the factory:
+
+```swift
+// FeedBuilder.swift
+let feedUseCase = FeedUseCaseFactory.createFeedUseCase(isUsingMock: isUsingMock)
+let viewModel = FeedViewModel(feedUseCase: feedUseCase)
 ```
 
-## Code Organization
+`FeedDetailsBuilder` is passed as a SwiftUI environment object so child views can build detail screens without upward coupling.
 
-### File Naming Conventions
+### Offline-First Strategy
 
-- Views: `*View.swift` (e.g., `FeedView.swift`)
-- ViewModels: `*ViewModel.swift` (e.g., `FeedViewModel.swift`)
-- Builders: `*Builder.swift` (e.g., `FeedBuilder.swift`)
-- Entities: `*Entity.swift` or `*Response.swift`
-- Use Cases: `*UseCase.swift`
-- Repositories: `*Repository.swift`
-- Mocks: `Mock*.swift`
+`FeedRepository` implements a cache-fallback pattern:
 
-### Dependency Flow
+1. Check network reachability (`NetworkReachability`)
+2. If online: fetch from network, save to SwiftData cache (fire-and-forget — cache failure doesn't propagate)
+3. If fetch fails or offline: load from SwiftData cache
+4. If no cache available: throw `FeedRepositoryError.noInternetAndNoCache`
 
+### Async Patterns
+
+`NetworkService` and the use-case protocols expose **all three** async patterns (completion handler, Combine `AnyPublisher`, async/await). `FeedViewModel` demonstrates wrapping the older patterns with `withCheckedThrowingContinuation` — this is intentional as a learning reference.
+
+### SwiftData Persistence
+
+`SwiftDataManager.shared` owns the `ModelContainer`. Cache entities (`CachedFeedEntity`, `CachedNewsFeedEntity`) live in `Last/Data/`. Repositories receive a `ModelContext` injected via the factory.
+
+### Feature Flags
+
+`FeatureFlag.swift` provides a `FeatureFlagManagerProtocol` backed by `UserDefaults`, with a mock for tests. Currently used to toggle carousel variants (`enhancedCarousel`, `genericCarousel`).
+
+## Testing
+
+Framework: **Swift Testing** (not XCTest).
+
+```swift
+@Suite(.serialized) struct FeedRepositoryTests {
+    @Test func fetchFeed_OnSuccess() async throws { ... }
+    // assertions use #expect(), not XCTAssert*
+}
 ```
-View → ViewModel → UseCase → Repository → NetworkService
-```
 
-Each layer depends only on protocols from the layer below, enabling:
-- Easy testing with mock implementations
-- Flexible dependency injection
-- Clear separation of concerns
+All layers have dedicated mock files (`Mock*.swift`) with configurable results and call counts. ViewModels are tested by injecting mock use cases; repositories are tested with `MockNetworkService` + `MockCacheRepository` + `MockNetworkReachability` for full scenario coverage (online success, offline+cache, offline+no cache, network error with cache fallback).
 
-### Testing Strategy
+## Key Files
 
-- Mock implementations (`MockFeedRepository`, `MockFeedUseCase`) for unit tests
-- Builders support `isUsingMock` parameter for SwiftUI previews
-- ViewModels are tested by injecting mock use cases
-- Network layer tested through repository mocks
-
-## Important Implementation Details
-
-### Network Layer
-
-`NetworkService` is a generic service that:
-- Accepts any `URLRequest`
-- Returns any `Decodable` type
-- Handles HTTP status validation (200-299)
-- Provides specific error types: `NetworkError.invalidResponse`, `NetworkError.decodingError`
-
-### State Management
-
-ViewModels use `@Observable` macro and expose state as:
-- `private(set) var`: Read-only properties for views
-- Async functions for actions (e.g., `loadData()`)
-- No manual `@Published` or `objectWillChange` needed
-
-### Constants
-
-API endpoints and UI constants are centralized in `Constants.swift`:
-- `Constants.url`: API endpoint URL
-- Other UI constants (image dimensions, corner radius)
+- `Last/Factory/FeedUseCaseFactory.swift` — root of the DI graph
+- `Last/NetworkService/NetworkService.swift` — generic `execute<T: Decodable>` with three overloads
+- `Last/Repository/FeedRepository.swift` — offline-first logic
+- `Last/FeatureFlag.swift` — feature flag system
+- `Last/TabBarView.swift` — top-level navigation; shows both SwiftUI and UIKit tabs
+- `LastTests/FeedRepositoryTests.swift` — most comprehensive test file (~620 lines)
